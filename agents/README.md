@@ -26,68 +26,170 @@ This directory contains project-specific sub-agents for Claude Code specialized 
 
 **Tools:** Read, Write, Edit, Grep, Glob, Bash, WebFetch
 
-**Model:** Inherits from main conversation
-
 **Example Invocations:**
 ```
 "Optimize my Claude Code setup"
 "Audit my .claude/ configuration"
 "Check if my skills follow best practices"
-"Help me improve my agents"
-"Review my CLAUDE.md file"
 ```
 
 ---
 
 ### 📚 documentation-architect
 
-**Purpose:** Expert in documentation and memory bank optimization
+**Purpose:** Expert in documentation and memory bank optimization for SmartLockers project
 
 **Use PROACTIVELY when:**
-- User mentions "documentation", "memory", "context"
-- Memory bank usage > 70%
+- User mentions "documentation", "memory", "context", "docs"
+- Memory bank usage > 70% (check with `/context`)
 - After completing major tasks/reviews
-- User wants to optimize CLAUDE.md
+- Need to create quick reference guides
 
 **Key Capabilities:**
-- ✅ Audits memory bank usage and suggests optimizations
-- ✅ Detects and cleans temporary files (reviews, tasks, prompts)
-- ✅ Creates concise quick-reference guides
+- ✅ Audits memory bank usage and proposes optimizations
+- ✅ Cleans temporary files (reviews, tasks, prompts > 30 days)
+- ✅ Creates concise quick-reference guides (< 2k tokens)
 - ✅ Consolidates redundant documentation
-- ✅ Organizes core vs contextual loading
-- ✅ Delegates to other agents for decisions
+- ✅ Delegates to other agents for specialized decisions (software-architect, product-owner-functional)
 - ❌ **NEVER modifies CLAUDE.md without explicit confirmation**
 
 **Tools:** Read, Write, Edit, Glob, Grep, Bash, Task
 
-**Model:** Inherits from main conversation
-
 **Slash Commands:**
 ```
-/optimize-memory     # Audit memory bank + propose optimizations
-/clean-docs          # Clean temporary documentation files
-/doc-quick-ref [component]  # Create quick reference guide
+/optimize-memory              # Audit memory bank + propose optimizations
+/clean-docs                   # Clean temporary documentation files
+/doc-quick-ref [component]    # Create quick reference guide
 ```
+
+**Common Use Cases:**
+
+**1. Memory Bank Optimization (> 70% usage)**
+```bash
+/optimize-memory
+```
+Agent analyzes memory bank, identifies heavy files, proposes consolidations.
+
+**2. Cleanup Temporary Files**
+```bash
+/clean-docs
+```
+Agent scans for old reviews/tasks, proposes archiving to `.archive/YYYY-MM/`.
+
+**3. Create Quick Reference**
+```bash
+/doc-quick-ref circuit-breakers
+```
+Agent creates 3-level guide: TL;DR (30s) → Quick Ref (5min) → Deep Dive (links).
 
 **Example Invocations:**
 ```
-"Memory bank is at 75%, can you optimize?"
-"Clean up old review files from documentation/"
-"Create a quick reference for the cache-resilience pattern"
-"Archive completed tasks older than 30 days"
+"Memory bank is at 75%, optimize"
+"Clean up old review files"
+"Create quick reference for cache-resilience pattern"
 ```
 
-**Cleanup Workflow:**
-1. Scans for temporary files > 30 days old
-2. Identifies files not referenced in CLAUDE.md
-3. Proposes archiving (conservative) or deletion (aggressive)
-4. Calculates token/disk savings
-5. ALWAYS asks for confirmation before any action
+**Collaboration:**
+- Delegates to `software-architect` for architecture decisions
+- Delegates to `product-owner-functional` for functional priorities
+- Works with `claude-code-optimizer` for Claude Code configuration
+- Works with `client-creator` for new client setup
+
+---
+
+### 🏗️ software-architect
+
+**Purpose:** Expert en architecture logicielle SmartLockers
+
+**Use PROACTIVELY when:**
+- Architecture decisions needed
+- Pattern selection (cache, resilience, performance)
+- Refactoring proposals
+- Technical design validation
+- Performance optimization
+
+**Key Capabilities:**
+- ✅ Validates architectural decisions against SmartLockers constraints
+- ✅ Proposes 3 options (conservative, pragmatic, innovative) for each decision
+- ✅ Enforces functional architecture (no classes)
+- ✅ Ensures cache-first pattern compliance
+- ✅ Validates multi-tenant isolation
+- ✅ Reviews performance implications
+
+**Tools:** Read, Grep, Glob, Bash
+
+**Example Invocations:**
+```
+"What pattern should I use for Beds24 API calls?"
+"Should I create a new table for this data?"
+"How to implement credentials update securely?"
+"Review this refactoring proposal"
+```
+
+**Typical response:** 3 options with pros/cons/effort + recommendation
+
+---
+
+### 📋 product-owner-functional
+
+**Purpose:** Expert métier SmartLockers (business rules and priorities)
+
+**Use PROACTIVELY when:**
+- Business rules validation needed
+- Functional specifications unclear
+- User story definition
+- Feature prioritization
+- Client-specific requirements
+
+**Key Capabilities:**
+- ✅ Validates business rules compliance
+- ✅ Defines testable acceptance criteria
+- ✅ Prioritizes features (P0/P1/P2/P3)
+- ✅ Knows client specifics (ONET, CosyHosting, Halpades, Lock and Chill)
+- ✅ Ensures multi-tenant business logic
+
+**Tools:** Read, Grep, Glob
+
+**Example Invocations:**
+```
+"What are the business rules for locker allocation?"
+"Should we allow booking cancellation after check-in?"
+"Define acceptance criteria for credentials update feature"
+"Which client has priority for this feature?"
+```
 
 **Collaboration:**
-- Consults `@agent-software-architect` for architecture decisions
-- Consults `@agent-product-owner-functional` for functional priorities
-- Consults `@agent-claude-code-optimizer` for Claude Code best practices
+- Consults `software-architect` for technical feasibility
+- Consults `documentation-architect` for business rules documentation
+
+---
+
+### 🤖 client-creator
+
+**Purpose:** Automated client creation with complete workflow
+
+**Use for:**
+- Creating new SmartLockers clients (generates all boilerplate)
+- Setting up credentials, tables, collections, tests
+- Validating client setup
+
+**Key Capabilities:**
+- ✅ Generates client functions file with routes
+- ✅ Creates database tables (cache + business)
+- ✅ Bootstraps credentials (Bearer token, machine login/password)
+- ✅ Generates Bruno API collection
+- ✅ Creates contract tests
+- ✅ Validates setup with PHPStan
+
+**Tools:** Read, Write, Edit, Bash, Grep, Glob
+
+**Example Invocations:**
+```
+"Create new client mycompany with Stripe and Mailgun APIs"
+"/new-client acme --apis=Beds24"
+```
+
+**Typical workflow:** 10-15 minutes (vs 30-45 min manual), -67% time, -80% errors
 
 ---
 
@@ -219,25 +321,57 @@ vim .claude/agents/agent-name.md
 rm .claude/agents/agent-name.md
 ```
 
+## Practical Tips
+
+### Working with documentation-architect
+
+**Tip 1: Check memory before optimizing**
+```bash
+/context              # See current memory usage
+/optimize-memory      # If > 70%, optimize
+```
+
+**Tip 2: Archive first, delete later**
+Start conservative, become aggressive once confident:
+1. First month: ALWAYS archive to `.archive/YYYY-MM/`
+2. After validation: Delete truly useless files
+3. Routine: Archive monthly, purge archives > 6 months
+
+**Tip 3: Create quick refs for frequently consulted docs**
+If you consult a doc often (> 3 times/week):
+```bash
+/doc-quick-ref component-name
+```
+Creates concise guide (< 2k tokens vs full doc).
+
+**Tip 4: Combine with claude-code-optimizer**
+For complete optimization:
+```bash
+/optimize-memory                        # Memory bank
+"@claude-code-optimizer audit .claude/" # Configuration
+```
+
 ## Integration with SmartLockers
 
 ### Project-Specific Context
 
 All agents have access to:
 - **CLAUDE.md** - Project instructions and standards
-- **Documentation** - `documentation/` directory
+- **Memory Bank** - `documentation/memory-bank/` (core + guides)
+- **Documentation** - `documentation/` directory (architecture, API, functional)
 - **Codebase** - All source files via Read/Grep/Glob tools
 
 ### SmartLockers Standards
 
-Agents should enforce:
+Agents enforce project conventions:
 - Architecture fonctionnelle pure (no classes)
-- Function naming (snake_case with prefixes)
-- Cache-first pattern
-- Bearer token auth
-- PHPStan niveau 6 compliance
-- 70/20/10 testing strategy
-- UUID usage for lockers
+- Function naming (snake_case with prefixes: `client_`, `api_`, `db_`, `auth_`)
+- Cache-first pattern (update cache ONLY on HTTP 2xx)
+- Bearer token auth (stateless, no sessions)
+- PHPStan niveau 6 compliance (0 errors)
+- 70/20/10 testing strategy (PHPStan 70%, Contracts 20%, Integration 10%)
+- UUID usage for lockers (not numeric IDs)
+- Multi-tenant isolation (table prefixes, no cross-access)
 
 ## Troubleshooting
 
