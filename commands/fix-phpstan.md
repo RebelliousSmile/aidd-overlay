@@ -2,6 +2,28 @@
 
 Fix PHPStan errors by running analysis, identifying issues, and applying corrections iteratively until 0 errors remain.
 
+---
+
+## 🚨 INSTRUCTION CRITIQUE pour Claude
+
+**AVANT toute exécution de commande, tu DOIS te placer dans le répertoire `code/`** :
+
+```bash
+cd /home/tnn/Projets/SmartLockers/middleware/code
+```
+
+**Toutes les commandes PHPStan s'exécutent depuis `code/`** :
+```bash
+cd code/
+composer phpstan     # Analyse PHPStan
+composer test        # Tests
+composer quality     # PHPStan + Tests
+```
+
+**Ne JAMAIS exécuter depuis la racine du projet (`/middleware/`)** ❌
+
+---
+
 ## Usage
 
 ```
@@ -10,6 +32,7 @@ Fix PHPStan errors by running analysis, identifying issues, and applying correct
 
 Or manually:
 ```bash
+cd code/
 composer phpstan  # See current errors
 # Then fix errors manually or ask Claude to fix them
 ```
@@ -29,10 +52,16 @@ This command documents the process and common fixes.
 ## What It Does
 
 ### 1. PHPStan Analysis
-Runs `composer phpstan` (level 5) on:
-- `code/src/` directory
-- `code/apis/` directory
-- `code/clients/` directory
+Runs `composer phpstan` (level 5) depuis le répertoire `code/` sur:
+- `src/` directory
+- `apis/` directory
+- `clients/` directory
+
+**Commande exécutée** :
+```bash
+cd code/
+composer phpstan
+```
 
 ### 2. Error Detection
 Identifies common PHPStan errors:
