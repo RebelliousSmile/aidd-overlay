@@ -1,199 +1,199 @@
 ---
 name: review-and-fix
-description: Automatise code review et corrections des problèmes critiques
+description: Automates code review and critical issue corrections
 ---
 
-# Commande : Review and Fix
+# Command: Review and Fix
 
-Tu vas automatiser le processus complet de code review et corrections.
+You will automate the complete code review and corrections process.
 
-## Étape 0 : Initialiser le tracking
+## Step 0: Initialize Tracking
 
-Utilise TodoWrite pour créer une todo list de suivi avec ces tâches :
-- Lire le fichier de review
-- Analyser les problèmes critiques
-- Créer les tâches de correction (une par problème critique)
-- Exécuter les corrections
-- Valider les corrections (PHPStan + Tests + Serveur PHP)
-- Nettoyer les tâches terminées
-- Générer la nouvelle review (écrase l'ancienne)
+Use TodoWrite to create a tracking todo list with these tasks:
+- Read the review file
+- Analyze critical issues
+- Create correction tasks (one per critical issue)
+- Execute corrections
+- Validate corrections (PHPStan + Tests + PHP Server)
+- Clean up completed tasks
+- Generate new review (overwrites the original)
 
-Marque chaque tâche comme `in_progress` avant de l'exécuter et `completed` après.
-Inscris un identifiant de commit dans la code review pour analyser s'il est pertinent de refaire une analyse du code (+ de 10 commits -> oui).
+Mark each task as `in_progress` before executing and `completed` after.
+Record a commit identifier in the code review to analyze if it's relevant to re-analyze the code (> 10 commits -> yes).
 
-## Étape 1 : Lire le fichier de review
+## Step 1: Read the Review File
 
-Demande à l'utilisateur quel fichier de review analyser.
+Ask the user which review file to analyze.
 
-Si l'utilisateur ne fournit pas de nom de composant ou de module, extrait-le du nom du fichier (ex: `sync-api-review.md` → `sync-api`).
+If user doesn't provide component or module name, extract it from filename (ex: `sync-api-review.md` → `sync-api`).
 
-## Étape 2 : Analyser les problèmes critiques
+## Step 2: Analyze Critical Issues
 
-Parse le contenu de la review et identifie tous les problèmes marqués comme **Critique** ou **CRITIQUE**.
+Parse the review content and identify all issues marked as **Critical** or **CRITIQUE**.
 
-Pour chaque problème identifié, extrais :
-- Le titre du problème
-- La description complète
-- Les fichiers concernés avec leurs numéros de ligne (format `fichier.php:123`)
-- La section dans laquelle le problème apparaît
+For each identified issue, extract:
+- Issue title
+- Complete description
+- Affected files with line numbers (format `file.php:123`)
+- Section where the issue appears
 
-## Étape 3 : Créer les tâches de correction
+## Step 3: Create Correction Tasks
 
-Pour chaque problème critique identifié, crée une tâche dans `documentation/tasks/`.
+For each critical issue identified, create a task in `documentation/tasks/`.
 
-Nomme les tâches selon ce pattern : `fix-{module}-{index}-{description-courte}.md`
+Name tasks according to this pattern: `fix-{module}-{index}-{short-description}.md`
 
-Chaque tâche doit contenir (format Markdown) :
-- **Titre** : Nom explicite du problème
-- **Contexte** : Résumé du problème identifié
-- **Fichiers concernés** : Liste avec chemins et numéros de ligne
-- **Plan de correction** : Étapes détaillées avec exemples de code PHP
-- **Critères de validation** : Tests à exécuter (`composer test`, `composer phpstan`)
-- **Conventions à respecter** : `snake_case`, préfixes fonctionnels, PHPDoc
+Each task must contain (Markdown format):
+- **Title**: Explicit issue name
+- **Context**: Issue summary
+- **Affected files**: List with paths and line numbers
+- **Correction plan**: Detailed steps with PHP code examples
+- **Validation criteria**: Tests to execute (`composer test`, `composer phpstan`)
+- **Conventions to respect**: `snake_case`, functional prefixes, PHPDoc
 
-## Étape 4 : Exécuter les corrections
+## Step 4: Execute Corrections
 
-Pour chaque tâche créée :
-1. Lis le fichier de tâche
-2. Applique les corrections nécessaires aux fichiers identifiés
-3. Vérifie que les modifications sont correctes
-4. Valide les corrections (voir Étape 5)
-5. Marque la tâche comme terminée
+For each created task:
+1. Read the task file
+2. Apply necessary corrections to identified files
+3. Verify modifications are correct
+4. Validate corrections (see Step 5)
+5. Mark task as completed
 
-## Étape 5 : Valider les corrections
+## Step 5: Validate Corrections
 
-**CRITIQUE** : Après chaque correction ou ensemble de corrections, exécute OBLIGATOIREMENT dans l'ordre :
+**CRITICAL**: After each correction or set of corrections, execute MANDATORY in order:
 
-1. **PHPStan niveau 5** : `composer phpstan`
-   - Doit retourner 0 erreur
-   - Si erreurs : corriger avant de continuer
+1. **PHPStan level 5**: `composer phpstan`
+   - Must return 0 errors
+   - If errors: fix before continuing
 
-2. **Tests de contrat** (si présents) : `composer test-contracts` ou tests PHP manuels
-   - Tous les tests doivent passer
-   - Si échecs : corriger avant de continuer
+2. **Contract tests** (if present): `composer test-contracts` or manual PHP tests
+   - All tests must pass
+   - If failures: fix before continuing
 
-3. **Test démarrage serveur PHP** : `timeout 3 php -S localhost:8001 -t public/ 2>&1`
-   - Le serveur doit démarrer sans erreur fatale
-   - Vérifie qu'aucune fonction n'est redéclarée (conflit de noms)
-   - Si erreur fatale : corriger avant de continuer
+3. **PHP server startup test**: `timeout 3 php -S localhost:8001 -t public/ 2>&1`
+   - Server must start without fatal error
+   - Check no function redeclaration (name conflict)
+   - If fatal error: fix before continuing
 
-**Si une seule validation échoue, la correction est considérée comme incomplète.**
+**If a single validation fails, the correction is considered incomplete.**
 
-## Étape 6 : Nettoyer les tâches terminées
+## Step 6: Clean Up Completed Tasks
 
-Supprime uniquement les fichiers de tâches qui ont été complètement terminées sans erreur ET validées (Étape 5).
+Delete only task files that have been completely finished without error AND validated (Step 5).
 
-## Étape 7 : Générer une nouvelle code review
+## Step 7: Generate New Code Review
 
-Génère une nouvelle code review complète du module après corrections, en analysant en profondeur :
-- **Performance et optimisations** : Boucles, requêtes DB, caching, résilience des données
-- **Maintenabilité du code** : Lisibilité, découplage, architecture fonctionnelle pure
-- **Best practices PHP** :
-  - Conventions de nommage (`snake_case` avec préfixes `client_`, `api_`, `provider_`, `db_`, `auth_`)
-  - Documentation PHPDoc obligatoire
-  - Analyse PHPStan niveau 5
-  - Gestion d'erreurs avec try/catch et error_log
-- **Architecture** : Cohérence avec les 3 couches (clients/apis/providers), pattern cache-first
-- **Sécurité** : Sanitisation des données, validation des autorisations client-first
+Generate a new complete code review of the module after corrections, analyzing in depth:
+- **Performance and optimizations**: Loops, DB queries, caching, data resilience
+- **Code maintainability**: Readability, decoupling, pure functional architecture
+- **PHP best practices**:
+  - Naming conventions (`snake_case` with prefixes `client_`, `api_`, `provider_`, `db_`, `auth_`)
+  - Mandatory PHPDoc documentation
+  - PHPStan level 5 analysis
+  - Error handling with try/catch and error_log
+- **Architecture**: Consistency with 3 layers (clients/apis/providers), cache-first pattern
+- **Security**: Data sanitization, client-first authorization validation
 
-Cette analyse détaillée déclenchera automatiquement l'agent senior-code-reviewer.
+This detailed analysis will automatically trigger the super-coder agent.
 
-Compare avec la review initiale et documente les améliorations apportées.
+Compare with initial review and document improvements made.
 
-**IMPORTANT** : Écrase le fichier de review original (celui fourni en entrée) avec la nouvelle version. Ne crée PAS un nouveau fichier avec un nom différent.
+**IMPORTANT**: Overwrite the original review file (the one provided as input) with the new version. Do NOT create a new file with a different name.
 
-## Format de détection des problèmes
+## Issue Detection Format
 
-Recherche ces patterns dans le fichier de review :
+Search these patterns in the review file:
 
-### Pattern 1 : Emoji rouge avec CRITIQUE en majuscules (prioritaire)
+### Pattern 1: Red emoji with CRITIQUE in capitals (priority)
 ```markdown
-- [🔴] **CRITIQUE** : `fichier.php:123` Description du problème (suggestion)
+- [🔴] **CRITICAL**: `file.php:123` Issue description (suggestion)
 ```
 
-### Pattern 2 : Section "Résumé des problèmes critiques"
+### Pattern 2: "Critical Issues Summary" Section
 ```markdown
-## Résumé des problèmes critiques
-### 🔴 Problèmes critiques identifiés
-1. **Titre du problème** - `fichier.php:123`
+## Critical Issues Summary
+### 🔴 Critical Issues Identified
+1. **Issue title** - `file.php:123`
 ```
 
-### Pattern 3 : Anciens formats (compatibilité)
+### Pattern 3: Legacy formats (compatibility)
 ```markdown
-**Critique** : Description avec `fichier.php:123`
-**CRITIQUE** : Autre description avec `autre.php:456`
+**Critical**: Description with `file.php:123`
+**CRITIQUE**: Other description with `other.php:456`
 ```
 
-**Extraction automatique** :
-- Capture le fichier et le numéro de ligne avec regex : `` `([^:]+\.php):(\d+)` ``
-- Capture la description complète du problème
-- Capture la suggestion de correction (entre parenthèses)
+**Automatic extraction**:
+- Capture file and line number with regex: `` `([^:]+\.php):(\d+)` ``
+- Capture complete issue description
+- Capture correction suggestion (between parentheses)
 
-## Sortie attendue
+## Expected Output
 
-Affiche un rapport détaillé :
-- Nombre de problèmes critiques identifiés
-- Tâches créées
-- Tâches exécutées avec succès
-- Tâches en erreur (à conserver pour debug)
-- Résumé des améliorations dans la nouvelle review
+Display detailed report:
+- Number of critical issues identified
+- Tasks created
+- Successfully executed tasks
+- Failed tasks (keep for debugging)
+- Summary of improvements in new review
 
-## Notes importantes
+## Important Notes
 
-- Ne supprime JAMAIS une tâche en erreur
-- Valide chaque correction avant de passer à la suivante (voir Étape 5)
-- Documente toutes les modifications apportées
-- Assure-toi que la nouvelle review reflète bien l'état après corrections
-- **OBLIGATOIRE** : Exécute les 3 validations (PHPStan + Tests + Serveur PHP) avant de marquer une correction comme terminée
-- Si le serveur PHP ne démarre pas (erreur fatale), la correction est INCOMPLÈTE
+- NEVER delete a failed task
+- Validate each correction before moving to next (see Step 5)
+- Document all modifications made
+- Ensure new review accurately reflects post-corrections state
+- **MANDATORY**: Execute all 3 validations (PHPStan + Tests + PHP Server) before marking correction as completed
+- If PHP server doesn't start (fatal error), correction is INCOMPLETE
 
-## Exemple de workflow complet
+## Complete Workflow Example
 
-### 1. Review initiale générée
+### 1. Initial Review Generated
 ```markdown
 ### Security
-- [🔴] **CRITIQUE** : `database/mysql.php:287` SQL injection via construction dynamique de nom de table (utiliser db_sanitize_table_name())
-- [🟡] **Avertissement** : `routes/allocations.php:180` Timeout manquant sur requête DB
+- [🔴] **CRITICAL**: `database/mysql.php:287` SQL injection via dynamic table name construction (use db_sanitize_table_name())
+- [🟡] **Warning**: `routes/allocations.php:180` Missing DB request timeout
 ```
 
-### 2. Détection automatique
-La commande extrait :
-- Problème 1 : SQL Injection → `database/mysql.php:287`
-- Problème 2 : (Ignoré car 🟡 non-critique)
+### 2. Automatic Detection
+Command extracts:
+- Issue 1: SQL Injection → `database/mysql.php:287`
+- Issue 2: (Ignored because 🟡 non-critical)
 
-### 3. Tâche créée
-Fichier : `documentation/tasks/fix-database-1-sql-injection.md`
+### 3. Task Created
+File: `documentation/tasks/fix-database-1-sql-injection.md`
 
-Contenu :
+Content:
 ```markdown
 # Fix SQL Injection - database/mysql.php
 
-## Contexte
-SQL injection via construction dynamique de nom de table détecté dans `database/mysql.php:287`
+## Context
+SQL injection via dynamic table name construction detected in `database/mysql.php:287`
 
-## Fichiers concernés
+## Affected Files
 - `database/mysql.php:287`
 
-## Plan de correction
-1. Créer la fonction `db_sanitize_table_name($tableName)` avec whitelist
-2. Appliquer la sanitisation à la ligne 287
-3. Documenter avec PHPDoc
+## Correction Plan
+1. Create function `db_sanitize_table_name($tableName)` with whitelist
+2. Apply sanitization at line 287
+3. Document with PHPDoc
 
-## Critères de validation
-- `composer phpstan` : Aucune erreur
-- `composer test` : Tests passants
-- Conventions : `snake_case` + préfixe `db_`
+## Validation Criteria
+- `composer phpstan`: No errors
+- `composer test`: Tests passing
+- Conventions: `snake_case` + `db_` prefix
 ```
 
-### 4. Correction appliquée
-Ajout de `db_sanitize_table_name()` dans `database/mysql.php`
+### 4. Correction Applied
+Added `db_sanitize_table_name()` in `database/mysql.php`
 
-### 5. Review mise à jour (écrase l'originale)
+### 5. Review Updated (overwrites original)
 ```markdown
 ### Security
-- [🟢] SQL injection risks - Corrigé avec db_sanitize_table_name()
-- [🟡] **Avertissement** : `routes/allocations.php:180` Timeout manquant (reste à faire)
+- [🟢] SQL injection risks - Fixed with db_sanitize_table_name()
+- [🟡] **Warning**: `routes/allocations.php:180` Missing timeout (remains todo)
 
-**Score global** : 8/10 (était 4/10)
-**Décision** : ✅ APPROUVÉ avec réserves mineures
+**Global score**: 8/10 (was 4/10)
+**Decision**: ✅ APPROVED with minor reservations
 ```

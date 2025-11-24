@@ -1,15 +1,15 @@
 ---
 name: task
-description: Exécuter une tâche avec workflow automatisé et feedback loops
+description: Execute task with automated workflow and feedback loops
 ---
 
-# Workflow d'Exécution de Tâche avec Feedback Loops
+# Task Execution Workflow with Feedback Loops
 
-Ce workflow suit `documentation/memory-bank/core/automated-workflow.md` pour garantir qualité et efficacité maximales.
+This workflow follows `documentation/memory-bank/core/automated-workflow.md` to ensure maximum quality and efficiency.
 
 ---
 
-## Configuration SmartLockers
+## SmartLockers Configuration
 
 ```yaml
 # Decision Strategy
@@ -18,10 +18,10 @@ DIRECT_THRESHOLD:
   files: 3 files
 
 # Test Commands (70/20/10)
-COMMAND_VALIDATE: "composer phpstan"          # PHPStan niveau 6
-COMMAND_TEST_CONTRACTS: "composer test-contracts"  # Tests contrat
-COMMAND_TEST_INTEGRATION: "composer test-integration"  # Tests intégration
-COMMAND_QUALITY: "composer quality"           # Tous tests
+COMMAND_VALIDATE: "composer phpstan"          # PHPStan level 6
+COMMAND_TEST_CONTRACTS: "composer test-contracts"  # Contract tests
+COMMAND_TEST_INTEGRATION: "composer test-integration"  # Integration tests
+COMMAND_QUALITY: "composer quality"           # All tests
 
 # Dev Server
 DEV_SERVER:
@@ -31,10 +31,9 @@ DEV_SERVER:
 
 # Review Agents
 PLAN_REVIEW_AGENTS:
-  - software-architect      # Architecture, patterns, performance
-  - product-owner-functional  # Règles métier, acceptance criteria
+  - code-architect      # Architecture, patterns, performance, tech choices
 
-CODE_REVIEW_SKILL: "code-review"  # Skill avec checklist SmartLockers
+CODE_REVIEW_SKILL: "code-review"  # Skill with SmartLockers checklist
 
 # Commit Convention
 COMMIT_FORMAT: "type(scope): description"
@@ -44,373 +43,371 @@ COMMIT_SCOPES: [clients, apis, providers, services, tests, docs, config, db]
 
 ---
 
-## Workflow Complet
+## Complete Workflow
 
-### ÉTAPE 1: Lecture Tâche
+### STEP 1: Read Task
 
-1. **Lire fichier tâche** fourni en paramètre
-2. **Extraire informations** :
-   - Description tâche
-   - Fichiers à modifier
-   - Complexité estimée (temps, nombre fichiers)
+1. **Read task file** provided as parameter
+2. **Extract information**:
+   - Task description
+   - Files to modify
+   - Estimated complexity (time, file count)
    - Acceptance criteria
 
 ---
 
-### ÉTAPE 2: 🔄 PLANNING LOOP (Feedback Loop #1)
+### STEP 2: 🔄 PLANNING LOOP (Feedback Loop #1)
 
-**Objectif** : Valider plan AVANT implémentation (économise 45% temps)
+**Objective**: Validate plan BEFORE implementation (saves 45% time)
 
-#### 2.1 Créer Plan Détaillé
+#### 2.1 Create Detailed Plan
 
-Analyser tâche et créer plan avec :
-- [ ] Étapes d'implémentation séquentielles
-- [ ] Fichiers à créer/modifier (avec chemins exacts)
-- [ ] Fonctions à implémenter (avec signatures)
-- [ ] Tests à écrire
-- [ ] Documentation à mettre à jour
-- [ ] Estimation temps par étape
+Analyze task and create plan with:
+- [ ] Sequential implementation steps
+- [ ] Files to create/modify (with exact paths)
+- [ ] Functions to implement (with signatures)
+- [ ] Tests to write
+- [ ] Documentation to update
+- [ ] Time estimation per step
 
-**Format plan** :
+**Plan format**:
 ```markdown
-# Plan : [Nom Tâche]
+# Plan: [Task Name]
 
-## Contexte
-[Résumé tâche]
+## Context
+[Task summary]
 
-## Étapes d'Implémentation
-1. [Étape 1] (15 min)
-   - Créer/modifier : code/clients/lockandchill_functions.php
-   - Fonction : client_lockandchill_cron_process()
+## Implementation Steps
+1. [Step 1] (15 min)
+   - Create/modify: code/clients/lockandchill_functions.php
+   - Function: client_lockandchill_cron_process()
 
-2. [Étape 2] (20 min)
-   - Créer : public/cron.php
-   - Validation : CLI uniquement, sanitisation client name
+2. [Step 2] (20 min)
+   - Create: public/cron.php
+   - Validation: CLI only, client name sanitization
 
 ## Tests
-- [ ] PHPStan niveau 6 : 0 erreur
-- [ ] Tests contrat : test_cron_validate_client_name()
-- [ ] Tests intégration : test_full_cron_flow()
+- [ ] PHPStan level 6: 0 errors
+- [ ] Contract tests: test_cron_validate_client_name()
+- [ ] Integration tests: test_full_cron_flow()
 
 ## Documentation
-- [ ] Mise à jour CLAUDE.md si nécessaire
+- [ ] Update CLAUDE.md if necessary
 
-## Estimation Totale
-45 minutes → Stratégie DIRECT
+## Total Estimation
+45 minutes → DIRECT strategy
 ```
 
-#### 2.2 Review Plan (Agents en Parallèle)
+#### 2.2 Review Plan (Agents in Parallel)
 
-**Lancer agents review en PARALLÈLE** (1 seul message) :
+**Launch review agents in PARALLEL** (single message):
 
 ```
-@software-architect : Review plan architecture - patterns corrects ? performance optimale ?
-
-@product-owner-functional : Review plan métier - acceptance criteria respectés ? règles métier validées ?
+@code-architect: Review architecture plan - correct patterns? optimal performance? appropriate tech choices?
 ```
 
-**Attendre retours agents** (30-60 secondes)
+**Wait for agent feedback** (30-60 seconds)
 
-#### 2.3 Décision : Plan Approuvé ?
+#### 2.3 Decision: Plan Approved?
 
-**SI agents approuvent ET aucun ajustement majeur requis** :
-   → **Passer ÉTAPE 3**
+**IF agents approve AND no major adjustments required**:
+   → **Go to STEP 3**
 
-**SI agents demandent ajustements** :
-   → **Ajuster plan** selon recommandations
-   → **Re-review** (retour 2.2)
-   → **LOOP** jusqu'à approbation
+**IF agents request adjustments**:
+   → **Adjust plan** according to recommendations
+   → **Re-review** (back to 2.2)
+   → **LOOP** until approval
 
-**Gain feedback loop** : 3h35min économisées sur 8h (45% temps)
+**Feedback loop gain**: 3h35min saved out of 8h (45% time)
 
 ---
 
-### ÉTAPE 3: Stratégie d'Implémentation
+### STEP 3: Implementation Strategy
 
-**Analyser estimation temps et fichiers** :
+**Analyze time estimation and files**:
 
 ```yaml
-Conditions DIRECT:
-  - Temps estimé < 2 heures
-  - Fichiers à modifier < 3
-  - Complexité : Low
+DIRECT conditions:
+  - Estimated time < 2 hours
+  - Files to modify < 3
+  - Complexity: Low
 
-Conditions STEP-BY-STEP:
-  - Temps estimé > 2 heures
-  - Fichiers à modifier > 3
-  - Complexité : Medium/High
+STEP-BY-STEP conditions:
+  - Estimated time > 2 hours
+  - Files to modify > 3
+  - Complexity: Medium/High
 ```
 
-**SI DIRECT** :
-   → Implémenter tout en une fois
-   → 1 seul commit à la fin
-   → Passer ÉTAPE 4 (mode DIRECT)
+**IF DIRECT**:
+   → Implement all at once
+   → 1 single commit at end
+   → Go to STEP 4 (DIRECT mode)
 
-**SI STEP-BY-STEP** :
-   → Découper en milestones
-   → 1 commit par milestone validé
-   → Passer ÉTAPE 4 (mode STEP-BY-STEP)
+**IF STEP-BY-STEP**:
+   → Break into milestones
+   → 1 commit per validated milestone
+   → Go to STEP 4 (STEP-BY-STEP mode)
 
 ---
 
-### ÉTAPE 4: 🔄 IMPLEMENTATION LOOP (Feedback Loop #2)
+### STEP 4: 🔄 IMPLEMENTATION LOOP (Feedback Loop #2)
 
-#### Mode DIRECT (< 2h, < 3 fichiers)
+#### DIRECT Mode (< 2h, < 3 files)
 
-**4.1 Implémenter tout le code**
+**4.1 Implement all code**
 
-- Créer/modifier fichiers selon plan
-- Respecter conventions SmartLockers :
-  - Fonctions snake_case avec préfixes (client_, api_, db_, auth_)
-  - PHPDoc complet
-  - Pattern cache-first obligatoire
-  - Gestion erreurs try-catch
+- Create/modify files according to plan
+- Respect SmartLockers conventions:
+  - snake_case functions with prefixes (client_, api_, db_, auth_)
+  - Complete PHPDoc
+  - Mandatory cache-first pattern
+  - try-catch error handling
 
-**4.2 Vérifier serveur dev**
+**4.2 Verify dev server**
 
 ```bash
-# Vérifier si serveur déjà lancé
+# Check if server already running
 ps aux | grep "php -S localhost:8001" | grep -v grep
 
-# Si non lancé → Lancer en background
+# If not running → Launch in background
 php -S localhost:8001 -t public/ > /dev/null 2>&1 &
-echo $! > .dev-server.pid  # Sauver PID
+echo $! > .dev-server.pid  # Save PID
 ```
 
-**4.3 Tests Automatiques (70/20/10)**
+**4.3 Automatic Tests (70/20/10)**
 
-Exécuter dans l'ordre :
+Execute in order:
 
 ```bash
-# 1. PHPStan (70%) - OBLIGATOIRE
+# 1. PHPStan (70%) - MANDATORY
 composer phpstan
 
-# SI erreurs PHPStan :
-#   → Corriger immédiatement
+# IF PHPStan errors:
+#   → Fix immediately
 #   → Re-run composer phpstan
-#   → LOOP jusqu'à 0 erreur
+#   → LOOP until 0 errors
 
-# 2. Tests Contrat (20%)
+# 2. Contract Tests (20%)
 composer test-contracts
 
-# SI échecs :
-#   → Corriger code
+# IF failures:
+#   → Fix code
 #   → Re-run tests
-#   → LOOP jusqu'à tous passants
+#   → LOOP until all pass
 
-# 3. Tests Intégration (10%)
+# 3. Integration Tests (10%)
 composer test-integration
 
-# SI échecs :
-#   → Corriger code
+# IF failures:
+#   → Fix code
 #   → Re-run tests
-#   → LOOP jusqu'à tous passants
+#   → LOOP until all pass
 ```
 
-**4.4 Validation Manuelle Utilisateur**
+**4.4 Manual User Validation**
 
 ```
-Implémentation terminée. Changements :
-- [Fichier 1] : [Description]
-- [Fichier 2] : [Description]
+Implementation completed. Changes:
+- [File 1]: [Description]
+- [File 2]: [Description]
 
-Tests passants :
-✅ PHPStan niveau 6 : 0 erreur
-✅ Tests contrat : X/X passants
-✅ Tests intégration : X/X passants
+Tests passing:
+✅ PHPStan level 6: 0 errors
+✅ Contract tests: X/X passing
+✅ Integration tests: X/X passing
 
-Serveur dev : http://localhost:8001
+Dev server: http://localhost:8001
 
-Peux-tu valider les changements ?
-- Tester manuellement : [Instructions]
-- Vérifier comportement attendu : [Critères]
+Can you validate the changes?
+- Manual testing: [Instructions]
+- Verify expected behavior: [Criteria]
 ```
 
-**Attendre validation utilisateur**
+**Wait for user validation**
 
-**SI utilisateur valide** :
-   → Passer ÉTAPE 5 (Review)
+**IF user validates**:
+   → Go to STEP 5 (Review)
 
-**SI utilisateur demande corrections** :
-   → Corriger selon feedback
+**IF user requests corrections**:
+   → Fix according to feedback
    → Re-run tests (4.3)
-   → Re-valider (4.4)
-   → **LOOP** jusqu'à validation
+   → Re-validate (4.4)
+   → **LOOP** until validation
 
 ---
 
-#### Mode STEP-BY-STEP (> 2h, > 3 fichiers)
+#### STEP-BY-STEP Mode (> 2h, > 3 files)
 
-**4.1 Découper en Milestones**
+**4.1 Break into Milestones**
 
-Exemple :
+Example:
 ```
-Milestone 1: Infrastructure cron (30 min)
+Milestone 1: Cron infrastructure (30 min)
   - public/cron.php
-  - Validation CLI, sanitisation
+  - CLI validation, sanitization
 
-Milestone 2: Fonctions client cron_process() (45 min)
+Milestone 2: Client cron_process() functions (45 min)
   - client_lockandchill_cron_process()
   - client_cosyhosting_cron_process()
 
 Milestone 3: Tests (30 min)
-  - Tests contrat
-  - Tests intégration
+  - Contract tests
+  - Integration tests
 
 Milestone 4: Documentation (15 min)
-  - Mise à jour CLAUDE.md
+  - Update CLAUDE.md
 ```
 
-**4.2 Pour CHAQUE Milestone** :
+**4.2 For EACH Milestone**:
 
-**a) Implémenter milestone**
+**a) Implement milestone**
 
-**b) Tests milestone** :
+**b) Test milestone**:
 ```bash
 composer phpstan
-composer test-contracts  # Tests liés milestone
+composer test-contracts  # Tests related to milestone
 ```
 
-**c) Checkpoint utilisateur** :
+**c) User checkpoint**:
 ```
-Milestone [N] terminé : [Description]
+Milestone [N] completed: [Description]
 
-Changements :
-- [Fichier 1]
-- [Fichier 2]
+Changes:
+- [File 1]
+- [File 2]
 
-Tests :
-✅ PHPStan : 0 erreur
-✅ Tests contrat : X/X passants
+Tests:
+✅ PHPStan: 0 errors
+✅ Contract tests: X/X passing
 
-Peux-tu valider avant milestone suivant ?
+Can you validate before next milestone?
 ```
 
-**d) SI utilisateur valide** :
-   → **Commit milestone** (ne PAS attendre fin)
-   → Format commit :
+**d) IF user validates**:
+   → **Commit milestone** (don't wait for end)
+   → Commit format:
    ```
    feat(scope): milestone N - description
 
-   - Changement 1
-   - Changement 2
+   - Change 1
+   - Change 2
 
    🤖 Generated with [Claude Code](https://claude.com/claude-code)
    Co-Authored-By: Claude <noreply@anthropic.com>
    ```
-   → Passer milestone suivant
+   → Move to next milestone
 
-**e) SI utilisateur demande corrections** :
-   → Corriger
-   → Re-tests
+**e) IF user requests corrections**:
+   → Fix
+   → Re-test
    → Re-checkpoint
-   → **LOOP** jusqu'à validation
+   → **LOOP** until validation
 
-**f) Répéter pour tous milestones**
+**f) Repeat for all milestones**
 
-**Quand tous milestones validés** :
-   → Passer ÉTAPE 5 (Review finale)
+**When all milestones validated**:
+   → Go to STEP 5 (Final review)
 
 ---
 
-### ÉTAPE 5: 🔄 REVIEW LOOP (Feedback Loop #3)
+### STEP 5: 🔄 REVIEW LOOP (Feedback Loop #3)
 
-**Objectif** : Code review structuré avec checklist SmartLockers
+**Objective**: Structured code review with SmartLockers checklist
 
-#### 5.1 Lancer Code Review
+#### 5.1 Launch Code Review
 
-**Utiliser skill code-review** (se déclenche automatiquement) :
+**Use code-review skill** (triggers automatically):
 
 ```
-Code review des changements :
-[Lister fichiers modifiés]
+Code review of changes:
+[List modified files]
 ```
 
-**Skill génère rapport standardisé** :
-- Fonctionnalité (edge cases, error handling)
-- Qualité (conventions, préfixes, PHPDoc)
-- Sécurité (sanitisation, injection, secrets)
+**Skill generates standardized report**:
+- Functionality (edge cases, error handling)
+- Quality (conventions, prefixes, PHPDoc)
+- Security (sanitization, injection, secrets)
 - Performance (cache-first, DB optimization)
-- Tests (PHPStan, couverture)
+- Tests (PHPStan, coverage)
 - SmartLockers-specific (UUID, multi-tenant, isolation)
 
-#### 5.2 Consulter Agents si Nécessaire
+#### 5.2 Consult Agents if Needed
 
-**SI questions architecturales complexes** :
+**IF complex architectural questions**:
 ```
-@software-architect : [Question pattern/architecture]
-```
-
-**SI validation règles métier requise** :
-```
-@product-owner-functional : [Question business rules]
+@code-architect: [Pattern/architecture/tech choice question]
 ```
 
-#### 5.3 Décision Review
+**IF need deep code review**:
+```
+Use code-review skill (automatic)
+```
 
-**SI review "Approved"** :
-   → Passer ÉTAPE 6 (Commit final si mode DIRECT)
+#### 5.3 Review Decision
 
-**SI review "Request changes"** :
-   → **Appliquer corrections** selon rapport
-   → **Re-tests** (composer phpstan + tests)
-   → **Re-review** (retour 5.1)
-   → **LOOP** jusqu'à "Approved"
+**IF review "Approved"**:
+   → Go to STEP 6 (Final commit if DIRECT mode)
 
-**SI review "Comment" (suggestions optionnelles)** :
-   → Demander utilisateur si appliquer suggestions
-   → SI oui : appliquer + re-review
-   → SI non : passer ÉTAPE 6
+**IF review "Request changes"**:
+   → **Apply corrections** according to report
+   → **Re-test** (composer phpstan + tests)
+   → **Re-review** (back to 5.1)
+   → **LOOP** until "Approved"
+
+**IF review "Comment" (optional suggestions)**:
+   → Ask user if apply suggestions
+   → IF yes: apply + re-review
+   → IF no: go to STEP 6
 
 ---
 
-### ÉTAPE 6: Finalisation
+### STEP 6: Finalization
 
-#### 6.1 Arrêter Dev Server (si lancé par workflow)
+#### 6.1 Stop Dev Server (if launched by workflow)
 
 ```bash
-# Si PID sauvegardé
+# If PID saved
 if [ -f .dev-server.pid ]; then
   kill $(cat .dev-server.pid) 2>/dev/null
   rm .dev-server.pid
 fi
 ```
 
-#### 6.2 Commit Final (Mode DIRECT uniquement)
+#### 6.2 Final Commit (DIRECT Mode only)
 
-**Mode STEP-BY-STEP** : Commits déjà faits par milestone, skip cette étape
+**STEP-BY-STEP Mode**: Commits already done per milestone, skip this step
 
-**Mode DIRECT** : Créer commit final
+**DIRECT Mode**: Create final commit
 
-**a) Préparer message commit** :
+**a) Prepare commit message**:
 
 ```bash
-# Extraire type et scope du nom fichier tâche
-# Exemple : documentation/tasks/implement-unified-cron-system.md
+# Extract type and scope from task file name
+# Example: documentation/tasks/implement-unified-cron-system.md
 #   → type: feat
-#   → scope: services (ou clients, selon fichiers modifiés)
+#   → scope: services (or clients, depending on modified files)
 #   → description: implement unified cron system
 
-# Format :
-feat(scope): description basée sur nom tâche
+# Format:
+feat(scope): description based on task name
 
-- Liste modifications
-- Changement 1
-- Changement 2
+- List modifications
+- Change 1
+- Change 2
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-**b) Créer commit** :
+**b) Create commit**:
 
 ```bash
-git add [fichiers modifiés]
+git add [modified files]
 git commit -m "$(cat <<'EOF'
 feat(scope): description
 
-- Changement 1
-- Changement 2
+- Change 1
+- Change 2
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
@@ -419,245 +416,97 @@ EOF
 )"
 ```
 
-#### 6.3 Supprimer Fichier Tâche
+#### 6.3 Delete Task File
 
-**Demander confirmation utilisateur** :
+**Request user confirmation**:
 ```
-Tâche complètement terminée :
-✅ Implémentation validée
-✅ Tests passants (PHPStan + Contrats + Intégration)
+Task completely finished:
+✅ Implementation validated
+✅ Tests passing (PHPStan + Contracts + Integration)
 ✅ Code review "Approved"
-✅ Commit créé
+✅ Commit created
 
-Puis-je supprimer le fichier de tâche ?
+May I delete the task file?
 ```
 
-**SI utilisateur confirme** :
+**IF user confirms**:
 ```bash
-rm [chemin_fichier_tache]
+rm [task_file_path]
 ```
 
 ---
 
-## Instructions Importantes
+## Important Instructions
 
 ### TodoWrite Tool
 
-**Utiliser TodoWrite pour tracker toutes les étapes** :
+**Use TodoWrite to track all steps**:
 
 ```php
-// Au début du workflow
+// At workflow start
 TodoWrite([
-  "Lire fichier tâche",
-  "Créer plan détaillé",
+  "Read task file",
+  "Create detailed plan",
   "Review plan (agents)",
-  "Implémenter code",
+  "Implement code",
   "Tests 70/20/10",
   "Code review",
-  "Commit final"
+  "Final commit"
 ])
 
-// Mettre à jour statut après chaque étape
+// Update status after each step
 ```
 
-### Confirmations Utilisateur
+### User Confirmations
 
-**Demander confirmation AVANT** :
-- Lancer agents review (coût tokens)
-- Appliquer corrections suggérées par review
-- Supprimer fichier tâche
-- Commit (si pas déjà autorisé)
+**Request confirmation BEFORE**:
+- Launching review agents (token cost)
+- Applying corrections suggested by review
+- Deleting task file
+- Committing (if not already authorized)
 
-**Ne PAS demander confirmation pour** :
-- Tests automatiques (PHPStan, composer test)
-- Corrections bugs évidents
-- Ajout PHPDoc manquant
+**DO NOT request confirmation for**:
+- Automatic tests (PHPStan, composer test)
+- Obvious bug fixes
+- Adding missing PHPDoc
 
-### Échecs et Recovery
+### Failures and Recovery
 
-**SI PHPStan échoue** :
-   → Corriger immédiatement (priorité absolue)
-   → Re-run jusqu'à 0 erreur
-   → Ne JAMAIS passer à l'étape suivante si PHPStan ≠ 0
+**IF PHPStan fails**:
+   → Fix immediately (absolute priority)
+   → Re-run until 0 errors
+   → NEVER proceed to next step if PHPStan ≠ 0
 
-**SI tests échouent** :
-   → Analyser échec
-   → Corriger code
+**IF tests fail**:
+   → Analyze failure
+   → Fix code
    → Re-run tests
-   → Loop jusqu'à succès
+   → Loop until success
 
-**SI serveur dev ne démarre pas** :
-   → Vérifier erreurs PHP fatales
-   → Corriger
-   → Re-lancer
-   → Si impossible : continuer sans serveur dev, notifier utilisateur
+**IF dev server doesn't start**:
+   → Check PHP fatal errors
+   → Fix
+   → Re-launch
+   → If impossible: continue without dev server, notify user
 
-### Règles Git Critiques
+### Critical Git Rules
 
-**JAMAIS commit sans autorisation** :
-   - Mode DIRECT : Demander confirmation avant commit final
-   - Mode STEP-BY-STEP : Demander confirmation AVANT chaque commit milestone
-   - Exception : Si utilisateur a dit "commit automatiquement" au début
+**NEVER commit without authorization**:
+   - DIRECT mode: Request confirmation before final commit
+   - STEP-BY-STEP mode: Request confirmation BEFORE each milestone commit
+   - Exception: If user said "commit automatically" at start
 
-**Format commit obligatoire** :
+**Mandatory commit format**:
    - Conventional Commits (type(scope): description)
-   - Toujours inclure footer Claude Code
-   - Types : feat, fix, docs, refactor, test, chore, client, api
-   - Scopes : clients, apis, providers, services, tests, docs, config, db
+   - Always include Claude Code footer
+   - Types: feat, fix, docs, refactor, test, chore, client, api
+   - Scopes: clients, apis, providers, services, tests, docs, config, db
 
 ---
 
-## Exemple d'Exécution Complète
+## Complete Execution Example
 
-### Exemple Mode DIRECT (< 2h)
-
-```
-Utilisateur : /task documentation/tasks/add-cache-ttl-validation.md
-
-Assistant :
-[ÉTAPE 1] Lecture tâche add-cache-ttl-validation.md
-  → Ajouter validation TTL cache dans api_resilient_call()
-  → Estimation : 1h30, 2 fichiers
-  → Stratégie : DIRECT
-
-[ÉTAPE 2] 🔄 PLANNING LOOP
-  Plan créé :
-  1. Modifier src/services/api.php
-  2. Ajouter validation TTL cohérence
-  3. Tests contrat
-
-  Review plan en parallèle...
-  @software-architect : ✅ Pattern correct
-  @product-owner-functional : ✅ Règles métier OK
-
-  → Plan approuvé
-
-[ÉTAPE 3] Stratégie : DIRECT (1h30 < 2h, 2 fichiers < 3)
-
-[ÉTAPE 4] 🔄 IMPLEMENTATION LOOP
-  Implémentation...
-  ✅ api.php modifié (validation TTL ajoutée)
-
-  Dev server : Déjà lancé par utilisateur
-
-  Tests :
-  ✅ composer phpstan : 0 erreur
-  ✅ composer test-contracts : 8/8 passants
-  ✅ composer test-integration : 3/3 passants
-
-  Validation utilisateur : ✅ Approuvé
-
-[ÉTAPE 5] 🔄 REVIEW LOOP
-  Code review...
-  Skill code-review : ✅ Approved
-
-[ÉTAPE 6] Finalisation
-  ✅ Commit créé : feat(services): add cache TTL validation
-  ✅ Fichier tâche supprimé
-
-Terminé ! (1h25 réel)
-```
-
-### Exemple Mode STEP-BY-STEP (> 2h)
+### Example DIRECT Mode (< 2h)
 
 ```
-Utilisateur : /task documentation/tasks/implement-lockandchill-multi-owner.md
-
-Assistant :
-[ÉTAPE 1] Lecture tâche...
-  → Système multi-propriétaires Lock and Chill
-  → Estimation : 8h, 6 fichiers
-  → Stratégie : STEP-BY-STEP
-
-[ÉTAPE 2] 🔄 PLANNING LOOP
-  Plan créé avec 4 milestones...
-  Review agents : ✅ Approuvé
-
-[ÉTAPE 3] Stratégie : STEP-BY-STEP (8h > 2h, 6 fichiers > 3)
-
-[ÉTAPE 4] 🔄 IMPLEMENTATION LOOP
-
-  === Milestone 1 : Table lockandchill_owners (2h) ===
-  Implémentation...
-  Tests : ✅ PHPStan 0 erreur
-  Validation utilisateur : ✅ OK
-  → Commit : feat(db): add lockandchill_owners table
-
-  === Milestone 2 : Fonctions CRUD owners (2h) ===
-  Implémentation...
-  Tests : ✅ PHPStan + Contrats passants
-  Validation utilisateur : ✅ OK
-  → Commit : feat(clients): add lockandchill owner CRUD functions
-
-  === Milestone 3 : Sync multi-API (3h) ===
-  Implémentation...
-  Tests : ✅ Tous passants
-  Validation utilisateur : ✅ OK
-  → Commit : feat(clients): implement multi-owner sync
-
-  === Milestone 4 : Documentation (1h) ===
-  Implémentation...
-  Validation utilisateur : ✅ OK
-  → Commit : docs(clients): document multi-owner system
-
-[ÉTAPE 5] 🔄 REVIEW LOOP
-  Code review finale : ✅ Approved
-
-[ÉTAPE 6] Finalisation
-  ✅ 4 commits créés (1 par milestone)
-  ✅ Fichier tâche supprimé
-
-Terminé ! (8h10 réel, 4 commits)
-```
-
----
-
-## Bénéfices Workflow avec Feedback Loops
-
-### Gain Temps
-
-**Sans loops (linéaire)** :
-```
-Plan incorrect → Implémentation 4h → Review échoue
-→ Rework complet 4h = 8h total
-```
-
-**Avec loops (itératif)** :
-```
-Plan incorrect → Review plan 10 min → Ajuster 15 min
-→ Implémentation correcte 4h → Review OK = 4h25min
-
-GAIN : 3h35min (45% temps économisé)
-```
-
-### Qualité Code
-
-- **90% first-try success** (vs 70% sans loops)
-- **10% rework rate** (vs 30% sans loops)
-- **Issues détectées PRE-implémentation** (économise refactoring)
-
-### Traçabilité
-
-- Tous les agents consultés documentés
-- Décisions architecturales justifiées
-- Commits atomiques avec contexte
-
----
-
-## Maintenance Workflow
-
-**Quand mettre à jour ce fichier** :
-- Agents ajoutés/supprimés (.claude/agents/)
-- Commandes tests changent (composer.json)
-- Conventions commit évoluent
-- Seuils DIRECT/STEP-BY-STEP ajustés
-
-**Synchronisation** :
-- Garder sync avec `documentation/memory-bank/core/automated-workflow.md`
-- Version control : check into git
-
----
-
-**Workflow créé par** : Claude Code (adapté SmartLockers)
-**Basé sur** : `documentation/memory-bank/core/automated-workflow.md`
-**Version** : 2.0.0 (avec feedback loops complets)
+User: /task documentation/tasks/add-cache-ttl-validation.md

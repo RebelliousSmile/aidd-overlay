@@ -1,12 +1,12 @@
 ---
 name: task-definition
-description: Create structured task definition following SmartLockers DoD. Use when defining implementation tasks, features, or technical work. Includes acceptance criteria and Definition of Done.
+description: Create structured task definition following project DoD. Use when defining implementation tasks, features, or technical work. Includes acceptance criteria and Definition of Done. Consults memory-bank for project-specific standards.
 allowed-tools: Read, Write, Edit, Grep, Glob
 ---
 
-# Task Definition - SmartLockers Client Manager
+# Task Definition
 
-Create a well-structured task definition following SmartLockers project standards and Definition of Done.
+Create a well-structured task definition following project standards and Definition of Done. **Agnostic** - consults memory-bank for project-specific rules.
 
 ## Instructions
 
@@ -19,12 +19,25 @@ When this skill is invoked, help the user create a comprehensive task definition
    - Why is it needed?
    - What are the technical constraints?
 
-2. **Check dependencies**:
+2. **Consult memory-bank** (MANDATORY):
+   ```bash
+   Read documentation/memory-bank/core/conventions-dev.md
+   Read documentation/memory-bank/core/architecture-essentials.md
+   ```
+
+   **Extract project-specific rules**:
+   - Naming conventions
+   - Testing strategy
+   - Architecture patterns
+   - Documentation requirements
+   - Definition of Done
+
+3. **Check dependencies**:
    - Search for related code using Grep/Glob
    - Identify files that need modification
    - Check existing documentation
 
-3. **Generate task document** using the template below
+4. **Generate task document** using the template below (adapted to project rules from memory-bank)
 
 ## Task Template
 
@@ -42,69 +55,58 @@ When this skill is invoked, help the user create a comprehensive task definition
 ## Technical Requirements
 
 ### Dependencies
-- Composer packages: [if any]
-- External APIs: [if any]
-- Database changes: [if any]
+- [List dependencies from project]
 
 ### Files to Modify
-- `path/to/file1.php` - [what changes]
-- `path/to/file2.php` - [what changes]
+- `path/to/file1.ext` - [what changes]
+- `path/to/file2.ext` - [what changes]
 
 ### APIs/Services Involved
-- API name - endpoint/function
-- SmartLockers Sync - functions used
+- [API/Service names and functions]
 
 ## Implementation Notes
 
-**Architecture considerations:**
-- Function naming: Use appropriate prefix (`client_`, `api_`, `provider_`, `db_`, `auth_`)
-- Manual requires: Update `require_once` if new files created
-- Cache-first pattern: Only update cache on HTTP 2xx responses
+**Consult memory-bank before implementing:**
+- Architecture patterns required
+- Naming conventions to follow
+- Security rules to apply
+- Performance patterns mandatory
 
-**Database migrations:**
-- If database migration needed: use `code/scripts/migrate.php up`
-- To edit migration: run `code/scripts/migrate.php down`, fix migration, run `code/scripts/migrate.php up`
-- Verify schema against `documentation/architecture/database-schema-complete.md`
-
-**Security:**
-- Bearer token authentication (no sessions)
-- Input validation and sanitization
-- No sensitive data in logs
+**Project-specific guidelines:**
+[Insert from memory-bank/core/conventions-dev.md]
 
 ## Definition of Done
 
 ### Code Implemented
-- [ ] Code functional and follows architecture fonctionnelle pure
-- [ ] Functions use snake_case with proper prefixes
-- [ ] Cache-first pattern respected
-- [ ] PHPDoc comments on all public functions
+- [ ] Code functional and follows project architecture
+- [ ] Follows naming conventions (from memory-bank)
+- [ ] Patterns respected (from memory-bank)
+- [ ] Documentation comments per project rules
 
 ### Tests Written and Passing
-**Stratégie 70/20/10:**
-- [ ] PHPStan niveau 6: 0 erreur (`composer phpstan`)
-- [ ] Tests de contrat: 5-8 tests max sur fonctions critiques
-- [ ] Tests d'intégration: 2-3 flux critiques si applicable
-- [ ] Tests < 10 lignes chacun
-- [ ] Exécution rapide (< 2 minutes total)
+[Extract testing strategy from memory-bank]
+- [ ] Static analysis: Pass (tool from memory-bank)
+- [ ] Unit/contract tests: Coverage targets met
+- [ ] Integration tests: Critical flows validated
+- [ ] Test execution time: Within project limits
 
 ### Documentation Updated
-- [ ] PHPDoc comments in source code
-- [ ] Architecture docs updated if structure changed
+- [ ] Code documentation (comments/docstrings per project style)
+- [ ] Architecture docs if structure changed
 - [ ] API documentation if new endpoints
-- [ ] README.md updated if user-facing changes
+- [ ] User-facing docs if needed
 
 ### Code Reviewed
-- [ ] Validation fonctionnelle
-- [ ] Respect conventions (nommage, structure, patterns)
-- [ ] Sécurité: audit données sensibles et sanitisation
-- [ ] PHPStan passes
+- [ ] Functional validation
+- [ ] Respect conventions (from memory-bank)
+- [ ] Security audit
+- [ ] Quality checks pass
 
 ### Deployed/Merged
-- [ ] Branch created from `develop`
-- [ ] Tests pass locally
+- [ ] Branch workflow followed (from memory-bank)
+- [ ] Tests pass
 - [ ] Code review completed
-- [ ] Merged to `develop`
-- [ ] Ready for merge to `main`
+- [ ] Ready for merge
 
 ## Priority
 - [ ] Critical
@@ -117,33 +119,39 @@ When this skill is invoked, help the user create a comprehensive task definition
 **Complexity:** [simple/moderate/complex]
 
 ## Related Documentation
-- Architecture: `documentation/architecture/`
-- Conventions: `documentation/developpement/conventions-nommage.md`
-- User Stories: `documentation/fonctionnel/user-stories.md`
+- Memory Bank Core: `documentation/memory-bank/core/`
+- Architecture Notebooks: `documentation/notebooks/architecture/`
+- Project-specific guides: `documentation/memory-bank/guides/`
 ```
+
+## Task File Placement
+
+**According to documentation-architect (strict 8 directories)**:
+
+```
+documentation/tasks/[task-name].md           # Active task
+documentation/tasks/plans/[plan-name].md     # Detailed plan
+```
+
+**When task completed**: Delete or archive
 
 ## Important Reminders
 
-**Before implementing:**
-1. Read `documentation/architecture/` to understand structure
-2. Check `documentation/developpement/bonnes-pratiques.md`
-3. Verify database fields in `documentation/architecture/database-schema-complete.md`
-4. Follow PHPDoc comment rules
-5. Respect 70/20/10 testing strategy
+**Before defining task:**
+1. **Read memory-bank** to understand project conventions
+2. **Search similar past tasks** in `documentation/tasks/` for reference
+3. **Verify DoD** matches project standards (from memory-bank)
+4. **Consult code-architect** if architectural decisions needed
 
-**SmartLockers Specific Rules:**
-- Architecture fonctionnelle pure (no classes)
-- Manual `require_once` (no PSR-4 autoloading)
-- Three layers: `code/clients/`, `code/apis/`, `code/providers/`
-- Cache-first mandatory for API responses
-- Bearer token auth only
+**Task must be:**
+- ✅ Actionable (clear what to do)
+- ✅ Testable (acceptance criteria measurable)
+- ✅ Documented (DoD from memory-bank)
+- ✅ Scoped (not too large, break down if > 2h)
 
 ## Historical Reference
 
-**Before defining a task**, check `documentation/tasks/` for similar past tasks:
-```bash
-ls documentation/tasks/
-```
+**Before defining a task**, check `documentation/tasks/` and `documentation/tasks/plans/` for similar past tasks.
 
 Use these as reference to:
 - Learn from previous task structures
@@ -151,8 +159,9 @@ Use these as reference to:
 - Maintain consistency with past work
 - Estimate effort based on similar completed tasks
 
-**Example past tasks:**
-- `implement-request-queue.md` - Queue system implementation
-- `fix-client-config-*.md` - Client configuration fixes
-- `fix-test-strategy-*.md` - Testing strategy implementation
-- `phpstan-level-6-migration.md` - PHPStan upgrade process
+## Collaboration
+
+- Consult **code-architect** for architectural validation
+- Use **super-coder** for implementation (after task defined)
+- Use **test-architect** for testing validation
+- Use **documentation-architect** for doc placement

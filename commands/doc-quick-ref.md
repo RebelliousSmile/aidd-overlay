@@ -7,7 +7,7 @@ Provide the component/pattern name as argument:
 
 The agent will:
 1. Consult existing documentation
-2. Delegate to `software-architect` or `product-owner-functional` if needed
+2. Delegate to `code-architect` if architectural decisions needed
 3. Create a 3-tier guide:
    - TL;DR (30 seconds)
    - Quick Reference (5 minutes) with code examples

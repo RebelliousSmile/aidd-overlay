@@ -1,79 +1,79 @@
 # Check Memory Bank Consistency
 
-Vérifier la cohérence et l'intégrité de la memory bank Claude Code.
+Verify Claude Code memory bank coherence and integrity.
 
-## Objectif
+## Objective
 
-Détecter automatiquement :
-- Fichiers référencés mais manquants
-- Doublons dans CLAUDE.md
-- Incohérences entre taille estimée et réelle
-- Opportunités d'optimisation
+Automatically detect:
+- Referenced but missing files
+- Duplicates in CLAUDE.md
+- Inconsistencies between estimated and actual size
+- Optimization opportunities
 
-## Actions à Exécuter
+## Actions to Execute
 
-### 1. Analyser CLAUDE.md
+### 1. Analyze CLAUDE.md
 
-Lire `/home/tnn/Projets/SmartLockers/client-manager/CLAUDE.md` et extraire toutes les références `@documentation/...`.
+Read `/home/tnn/Projets/SmartLockers/middleware/CLAUDE.md` and extract all `@documentation/...` references.
 
-### 2. Vérifier l'Existence
+### 2. Verify Existence
 
-Pour chaque fichier référencé, vérifier qu'il existe sur le disque.
+For each referenced file, verify it exists on disk.
 
-### 3. Détecter les Doublons
+### 3. Detect Duplicates
 
-Identifier les fichiers référencés plusieurs fois.
+Identify files referenced multiple times.
 
-### 4. Estimer les Tokens
+### 4. Estimate Tokens
 
-Comparer les estimations de tokens dans les commentaires vs la taille réelle des fichiers.
+Compare token estimates in comments vs actual file sizes.
 
-### 5. Suggérer des Améliorations
+### 5. Suggest Improvements
 
-Basé sur les recommandations de `claude-code-optimizer`, suggérer des fichiers à ajouter ou retirer.
+Based on `claude-code-optimizer` recommendations, suggest files to add or remove.
 
-## Format de Sortie
+## Output Format
 
-Produire un rapport structuré :
+Produce structured report:
 
 ```markdown
 ## 📊 Memory Bank Health Check
 
-**Date** : 2025-10-24
-**Fichiers analysés** : X références dans CLAUDE.md
+**Date**: 2025-10-24
+**Files analyzed**: X references in CLAUDE.md
 
-### ✅ Statut Global
+### ✅ Global Status
 
-- Fichiers valides : X/X
-- Fichiers manquants : 0
-- Doublons détectés : 0
-- Incohérences : 0
+- Valid files: X/X
+- Missing files: 0
+- Detected duplicates: 0
+- Inconsistencies: 0
 
-### 📁 Fichiers Chargés
+### 📁 Loaded Files
 
-1. ✅ CLAUDE.md (4.0k tokens estimés, 4.2k réels)
-2. ✅ architecture/README.md (1.5k tokens estimés, 1.6k réels)
-3. ❌ **MANQUANT** : architecture/11-api-integration-patterns.md
-4. ⚠️ **DOUBLON** : api/sync.md (référencé 2 fois lignes 42 et 58)
+1. ✅ CLAUDE.md (4.0k tokens estimated, 4.2k actual)
+2. ✅ architecture/README.md (1.5k tokens estimated, 1.6k actual)
+3. ❌ **MISSING**: architecture/11-api-integration-patterns.md
+4. ⚠️ **DUPLICATE**: api/sync.md (referenced twice lines 42 and 58)
 
-### 💡 Recommandations
+### 💡 Recommendations
 
-1. **Ajouter** : architecture/11-api-integration-patterns.md (5.5k tokens)
-2. **Ajouter** : architecture/06-security-architecture.md (5.7k tokens)
-3. **Retirer doublon** : api/sync.md ligne 58
-4. **Total après optimisation** : 67.8k tokens (34% du contexte)
+1. **Add**: architecture/11-api-integration-patterns.md (5.5k tokens)
+2. **Add**: architecture/06-security-architecture.md (5.7k tokens)
+3. **Remove duplicate**: api/sync.md line 58
+4. **Total after optimization**: 67.8k tokens (34% of context)
 
-### 🎯 Actions Suggérées
+### 🎯 Suggested Actions
 
-- [ ] Décommenter `@documentation/architecture/11-api-integration-patterns.md`
-- [ ] Décommenter `@documentation/architecture/06-security-architecture.md`
-- [ ] Retirer ligne 58 (doublon api/sync.md)
-- [ ] Relancer `/check-memory` pour validation
+- [ ] Uncomment `@documentation/architecture/11-api-integration-patterns.md`
+- [ ] Uncomment `@documentation/architecture/06-security-architecture.md`
+- [ ] Remove line 58 (duplicate api/sync.md)
+- [ ] Re-run `/check-memory` for validation
 ```
 
 ## Notes
 
-- Utiliser `Read` pour lire CLAUDE.md
-- Utiliser `Bash` pour `file_exists` ou `wc -w`
-- Utiliser `Glob` pour lister les fichiers documentation/
-- Ne PAS modifier CLAUDE.md automatiquement (demander confirmation)
+- Use `Read` to read CLAUDE.md
+- Use `Bash` for `file_exists` or `wc -w`
+- Use `Glob` to list documentation/ files
+- DO NOT modify CLAUDE.md automatically (request confirmation)

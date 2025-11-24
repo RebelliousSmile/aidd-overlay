@@ -865,7 +865,7 @@ try {
 
 ### Step 6: Generate Documentation
 
-**Create** `documentation/api/${api_name}.md`:
+**Create** `documentation/notebooks/api/${api_name}.md`:
 
 ```markdown
 # API : ${ApiName}
@@ -1150,7 +1150,7 @@ echo "✅ Validation complète passée"
 
 ✅ \`code/apis/${api_name}_functions.php\` (pattern cache-first ✓)
 ✅ \`code/tests/contracts/test_api_${api_name}.php\` (tests de contrat)
-✅ \`documentation/api/${api_name}.md\` (documentation complète)
+✅ \`documentation/notebooks/api/${api_name}.md\` (documentation complète)
 
 ## Fichiers à Modifier
 
@@ -1233,14 +1233,14 @@ bruno run apis/${api_name}/
 
 ## Ressources
 
-- **Documentation** : \`documentation/api/${api_name}.md\`
+- **Documentation** : \`documentation/notebooks/api/${api_name}.md\`
 - **Guide intégration** : \`documentation/memory-bank/guides/api-integration.md\`
 - **Exemples** : \`code/apis/pilotphone_functions.php\` (référence)
 
 ## Support
 
 Pour questions ou problèmes :
-- Consulter documentation : \`documentation/api/${api_name}.md\`
+- Consulter documentation : \`documentation/notebooks/api/${api_name}.md\`
 - Voir exemples : \`code/apis/guesty_functions.php\`, \`code/apis/pilotphone_functions.php\`
 - Tests référence : \`code/tests/contracts/test_api_guesty.php\`
 

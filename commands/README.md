@@ -4,28 +4,24 @@ This directory contains custom slash commands for the SmartLockers Client Manage
 
 ## Quick Reference
 
-| Commande | Catégorie | Quand Utiliser |
-|----------|-----------|----------------|
-| `/update-docs` | 📝 Documentation | Après modif code |
+| Command | Category | When to Use |
+|---------|----------|-------------|
+| `/update-docs` | 📝 Documentation | After code modification |
 | `/optimize-memory` | 📝 Documentation | Memory bank > 70% |
-| `/clean-docs` | 📝 Documentation | Maintenance mensuelle |
-| `/doc-quick-ref` | 📝 Documentation | Créer guide rapide |
-| `/review-and-fix` | 🔍 Quality | Avant commit |
-| `/fix-phpstan` | 🔍 Quality | Après PHPStan fails |
-| `/task` | ⚙️ Workflow | Feature complète |
-| `/create-client-migration` | ⚙️ Workflow | Nouveau client |
-| `/check-memory` | 📊 Analysis | Quotidien |
-| `/analyze-api-cache` | 📊 Analysis | Analyse cache |
+| `/clean-docs` | 📝 Documentation | Monthly maintenance |
+| `/doc-quick-ref` | 📝 Documentation | Create quick guide |
+| `/review-and-fix` | 🔍 Quality | Before commit |
+| `/fix-phpstan` | 🔍 Quality | After PHPStan fails |
+| `/task` | ⚙️ Workflow | Complete feature |
+| `/create-client-migration` | ⚙️ Workflow | New client |
+| `/check-memory` | 📊 Analysis | Daily |
+| `/analyze-api-cache` | 📊 Analysis | Cache analysis |
 
 ## Available Commands
 
 ### `/create-client-migration`
 
 Generates a database migration file to create the required API cache table for a new client.
-
-### `/analyze-api-cache`
-
-Analyzes API routes and cached data for a client, then proposes a database consolidation schema with test tables.
 
 #### Usage
 
@@ -42,56 +38,11 @@ You can also run the script directly from the command line:
 php code/scripts/create_client_migration.php
 ```
 
-Or make it executable and run:
+### `/analyze-api-cache`
 
-```bash
-./scripts/create_client_migration.php
-```
+Analyzes API routes and cached data for a client, then proposes a database consolidation schema with test tables.
 
-#### What It Does
-
-The command generates a migration file to create the `{client}_api_cache` table with:
-- Complete CREATE TABLE statement with proper indexes and constraints
-- Rollback functionality (down() function) to drop the table
-- PHPDoc documentation
-- Error handling
-
-#### Table Created
-
-**{client}_api_cache** - Standard API cache table
-- Stores API response data with expiration
-- Indexed for optimal cache key lookups
-- Supports cache invalidation strategies
-
-Note: Client-specific tables (guesty_*, pilotphone_*, etc.) are not automatically created. They should be created manually as needed based on the client's specific requirements.
-
-#### After Generation
-
-Once the migration is generated, run it with:
-
-```bash
-php code/scripts/migrate.php up
-```
-
-This will execute all pending migrations, including the newly created one.
-
-#### Example
-
-```bash
-$ php code/scripts/create_client_migration.php
-Enter the client name (lowercase, e.g., 'newclient'): acme
-
-✓ Migration created successfully!
-
-Client: acme
-File: /path/to/src/migrations/20251003123456_create_acme_api_cache.php
-
-Table to be created:
-  - acme_api_cache
-
-To run this migration, execute:
-  php code/scripts/migrate.php up
-```
+---
 
 ## 📝 Documentation Commands
 
@@ -278,147 +229,91 @@ composer phpstan  # 0 errors ✅
 
 ---
 
-## Command Descriptions
+## 📊 Analysis Commands
 
-### `/create-client-migration`
+### `/check-memory`
 
-Creates a complete client setup:
-- Migration file for `{client}_api_cache` table
-- Client routes file with process and entity routes
-- Stub implementations ready to customize
+**Purpose:** Verify memory bank consistency
 
-**Interactive prompts for:**
-- Client name
-- APIs used (MSExchange, Pilotphone, etc.)
-- Entities managed (reservations, vehicles, agents, etc.)
+**When:** Daily or when issues suspected
 
-**Use case:** When adding a new client to the system.
+**What it does:**
+- Verifies all referenced files exist
+- Detects duplicates
+- Estimates token usage
+- Proposes optimizations
 
 **Example:**
 ```bash
-/create-client-migration
-# Prompts for: client name, APIs, entities
-php code/scripts/migrate.php up
+/check-memory
+
+# Result:
+# - 1 missing file detected
+# - 2 duplicates found
+# - 5 optimization opportunities
 ```
 
-**Generated routes:**
-- `process-{client}` (POST) - Cache synchronization
-- `{entity}` (GET) - Get all entities
-- `{entity}/{id}` (GET) - Get entity by ID
+---
 
-### `/analyze-api-cache <client_name>`
+## Complete Documentation Workflow
 
-Analyzes API routes, cache keys, and data structures for a client, then generates:
-- Database consolidation schema proposals
-- Duplicate `test_*` tables for testing
-- Migration file ready to execute
-
-**Use case:**
-- Consolidating cached data into structured tables
-- Creating test tables for integration tests
-- Understanding data flows for a client
-
-**Example:**
-```bash
-/analyze-api-cache halpades
-php code/scripts/migrate.php up
-```
-
-**Features:**
-- ✅ Automatic code analysis (finds all `api_store_result()` calls)
-- ✅ Cache data structure analysis
-- ✅ Smart table proposals based on data patterns
-- ✅ Automatic `test_*` table generation
-- ✅ Ready-to-use migration file
-
-### `/fix-phpstan`
-
-Fixes PHPStan errors iteratively until 0 errors remain. Documents common error types and their fixes.
-
-**Use case:**
-- Ensuring code quality and type safety
-- Compliance with PHPStan level 5
-- Adding missing PHPDoc comments
-- Fixing undefined functions
-
-**Process:**
-1. Run `composer phpstan` to identify errors
-2. Work with Claude to fix errors
-3. Verify fixes by re-running PHPStan
-4. Repeat until 0 errors
-
-**Common fixes:**
-- Add missing PHPDoc blocks
-- Create stub functions for undefined functions
-- Add type hints to parameters and returns
-- Remove dead catch blocks
-
-**Example:**
-```bash
-composer phpstan  # See errors
-# Work with Claude to fix
-composer phpstan  # Verify: 0 errors ✅
-```
-
-## Workflow Complet Documentation
-
-### Scénario : Développement Feature Complète
+### Scenario: Complete Feature Development
 
 ```bash
-# 1. Développement
+# 1. Development
 vim apis/sync.php
 composer test
 
-# 2. Synchronisation automatique docs
+# 2. Automatic docs sync
 /update-docs apis/sync.php
-# → Génère docs API, PHPDoc, exemples
+# → Generates API docs, PHPDoc, examples
 
-# 3. Vérification memory bank
+# 3. Memory bank verification
 /check-memory
-# Si > 70% :
+# If > 70%:
 /optimize-memory
-# → Consolide, crée quick refs
+# → Consolidates, creates quick refs
 
-# 4. Review code
+# 4. Code review
 /review-and-fix
-# → Détecte issues, propose fixes
+# → Detects issues, proposes fixes
 
 # 5. Commit
 git add . && git commit -m "feat: add endpoint + docs"
 ```
 
-### Scénario : Maintenance Mensuelle
+### Scenario: Monthly Maintenance
 
 ```bash
-# 1. Nettoyage fichiers temporaires
+# 1. Cleanup temporary files
 /clean-docs
-# → Archive reviews, tasks, prompts > 30j
+# → Archives reviews, tasks, prompts > 30 days
 
-# 2. Optimisation memory bank
+# 2. Memory bank optimization
 /optimize-memory
-# → Consolide redondances
+# → Consolidates redundancies
 
-# 3. Vérification qualité code
+# 3. Code quality check
 composer phpstan
-# Si erreurs :
+# If errors:
 /fix-phpstan
 ```
 
 ---
 
-## Documentation vs Optimisation : Quelle Commande ?
+## Documentation vs Optimization: Which Command?
 
-| Besoin | Commande | Agent |
-|--------|----------|-------|
-| Code modifié → docs à sync | `/update-docs` | - |
+| Need | Command | Agent |
+|------|---------|-------|
+| Code modified → docs to sync | `/update-docs` | - |
 | Memory bank > 70% | `/optimize-memory` | `documentation-architect` |
-| Fichiers temp à nettoyer | `/clean-docs` | `documentation-architect` |
-| Guide rapide à créer | `/doc-quick-ref` | `documentation-architect` |
+| Temp files to clean | `/clean-docs` | `documentation-architect` |
+| Quick guide to create | `/doc-quick-ref` | `documentation-architect` |
 
-**Règle d'or** :
-- `/update-docs` = **génération** depuis code
-- `/optimize-memory` = **optimisation** docs existantes
-- `/clean-docs` = **nettoyage** fichiers obsolètes
+**Golden rule**:
+- `/update-docs` = **generation** from code
+- `/optimize-memory` = **optimization** of existing docs
+- `/clean-docs` = **cleanup** of obsolete files
 
 ---
 

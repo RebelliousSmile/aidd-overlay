@@ -1,411 +1,280 @@
-# SmartLockers Client Manager - Claude Code Agents
+# Claude Code Agents - SmartLockers Client Manager
 
-This directory contains project-specific sub-agents for Claude Code specialized task delegation.
-
-## Available Agents
-
-### 🔧 claude-code-optimizer
-
-**Purpose:** Expert in Claude Code configuration and optimization
-
-**Use PROACTIVELY for:**
-- Auditing Claude Code setup (skills, agents, commands, hooks)
-- Improving configuration based on official best practices
-- Optimizing existing components for better performance
-- Fixing YAML frontmatter issues
-- Creating new skills/agents when needed
-- Consulting latest Claude Code documentation
-
-**Key Capabilities:**
-- ✅ Audits entire `.claude/` directory structure
-- ✅ Validates YAML frontmatter syntax
-- ✅ Fetches latest official documentation
-- ✅ Provides detailed optimization reports
-- ✅ Implements improvements incrementally
-- ✅ Documents rationale for all changes
-
-**Tools:** Read, Write, Edit, Grep, Glob, Bash, WebFetch
-
-**Example Invocations:**
-```
-"Optimize my Claude Code setup"
-"Audit my .claude/ configuration"
-"Check if my skills follow best practices"
-```
+**Agent architecture**: 7 specialized agents with clearly defined responsibilities.
 
 ---
 
-### 📚 documentation-architect
+## 🎯 Agent Definitions
 
-**Purpose:** Expert in documentation and memory bank optimization for SmartLockers project
+### 1. claude-code-optimizer
 
-**Use PROACTIVELY when:**
-- User mentions "documentation", "memory", "context", "docs"
-- Memory bank usage > 70% (check with `/context`)
-- After completing major tasks/reviews
-- Need to create quick reference guides
+**Responsibilities**:
+- Knowledge of Claude Code functionality
+- Modifications in `.claude/` (agents, hooks, skills, config)
+- Optimization of model responses
+- Claude Code configuration optimization (project + global)
 
-**Key Capabilities:**
-- ✅ Audits memory bank usage and proposes optimizations
-- ✅ Cleans temporary files (reviews, tasks, prompts > 30 days)
-- ✅ Creates concise quick-reference guides (< 2k tokens)
-- ✅ Consolidates redundant documentation
-- ✅ Delegates to other agents for specialized decisions (software-architect, product-owner-functional)
-- ❌ **NEVER modifies CLAUDE.md without explicit confirmation**
+**Domain**: Meta-configuration (Claude Code itself)
 
-**Tools:** Read, Write, Edit, Glob, Grep, Bash, Task
+**When to invoke**:
+- Agent creation/modification
+- Hooks/skills/commands configuration
+- Prompt optimization
+- Claude Code configuration improvement
 
-**Slash Commands:**
-```
-/optimize-memory              # Audit memory bank + propose optimizations
-/clean-docs                   # Clean temporary documentation files
-/doc-quick-ref [component]    # Create quick reference guide
-```
-
-**Common Use Cases:**
-
-**1. Memory Bank Optimization (> 70% usage)**
-```bash
-/optimize-memory
-```
-Agent analyzes memory bank, identifies heavy files, proposes consolidations.
-
-**2. Cleanup Temporary Files**
-```bash
-/clean-docs
-```
-Agent scans for old reviews/tasks, proposes archiving to `.archive/YYYY-MM/`.
-
-**3. Create Quick Reference**
-```bash
-/doc-quick-ref circuit-breakers
-```
-Agent creates 3-level guide: TL;DR (30s) → Quick Ref (5min) → Deep Dive (links).
-
-**Example Invocations:**
-```
-"Memory bank is at 75%, optimize"
-"Clean up old review files"
-"Create quick reference for cache-resilience pattern"
-```
-
-**Collaboration:**
-- Delegates to `software-architect` for architecture decisions
-- Delegates to `product-owner-functional` for functional priorities
-- Works with `claude-code-optimizer` for Claude Code configuration
-- Works with `client-creator` for new client setup
+**Available tools**: Read, Grep, Glob, WebFetch
 
 ---
 
-### 🏗️ software-architect
+### 2. documentation-architect
 
-**Purpose:** Expert en architecture logicielle SmartLockers
+**Responsibilities**:
+- Ensures files in `documentation/` respect the 8 defined directories
+- Modifications in `documentation/`
+- Optimizes knowledge used by models
+- Optimizes quality and quantity of knowledge loaded in memory-bank
 
-**Use PROACTIVELY when:**
-- Architecture decisions needed
-- Pattern selection (cache, resilience, performance)
-- Refactoring proposals
-- Technical design validation
+**Domain**: Documentation and memory bank
+
+**8 mandatory directories**:
+- `memory-bank/` (how to code + agent triggering)
+- `notebooks/` (functional markdown docs, Warp compatible)
+- `guides/` (end-user guides .tex LaTeX)
+- `diagrams/` (visuals SVG, PNG, Mermaid)
+- `reports/` (model-generated documents)
+- `tasks/` (plans with subdirectories)
+- `reviews/` (generated reviews)
+- `wireframes/` (HTML interfaces)
+
+**When to invoke**:
+- Documentation organization/reorganization
+- Memory-bank optimization
+- Guide/notebook creation
+- Documentation structure validation
+
+**Available tools**: Read, Write, Edit, Glob, Grep, Bash, Task
+
+---
+
+### 3. test-architect
+
+**Responsibilities**:
+- Test project code functionality
+- Verify tests are up to date and organized per project rules
+- Launch tests that verify the requested task as quickly as possible
+- Choose methods that allow analyzing test results **without user intervention**
+- Fix tests if necessary
+
+**Domain**: Tests and automated quality
+
+**SmartLockers test strategy**: 70/20/10
+- 70% PHPStan level 6
+- 20% Contract tests (5-8 tests max)
+- 10% Integration tests (2-3 critical flows)
+
+**When to invoke**:
+- Generated code validation
+- Fix broken tests
+- Add new tests
+- Test coverage audit
+
+**Available tools**: Read, Write, Edit, Bash, Glob, Grep
+
+---
+
+### 4. code-architect
+
+**Responsibilities**:
+- Project technology choices
+- Define structures and rules underlying the code
+- Analyze efficiency and quality of generated code
+- Know security and code optimization best practices
+- Propose improvements and enumerate code problems
+
+**Domain**: Technical architecture and structural decisions
+
+**When to invoke**:
+- Architectural decisions (new module, refactoring)
+- Code quality/security audit
 - Performance optimization
+- Pattern validation
 
-**Key Capabilities:**
-- ✅ Validates architectural decisions against SmartLockers constraints
-- ✅ Proposes 3 options (conservative, pragmatic, innovative) for each decision
-- ✅ Enforces functional architecture (no classes)
-- ✅ Ensures cache-first pattern compliance
-- ✅ Validates multi-tenant isolation
-- ✅ Reviews performance implications
-
-**Tools:** Read, Grep, Glob, Bash
-
-**Example Invocations:**
-```
-"What pattern should I use for Beds24 API calls?"
-"Should I create a new table for this data?"
-"How to implement credentials update securely?"
-"Review this refactoring proposal"
-```
-
-**Typical response:** 3 options with pros/cons/effort + recommendation
+**Available tools**: Read, Grep, Glob, Bash
 
 ---
 
-### 📋 product-owner-functional
+### 5. super-coder
 
-**Purpose:** Expert métier SmartLockers (business rules and priorities)
+**Responsibilities**:
+- Generate code respecting documentation
+- If complex code: use tasks to break down generation
+- Launch test-architect agent to test its work
+- Launch other super-coder agents **in parallel** if it allows coding faster
 
-**Use PROACTIVELY when:**
-- Business rules validation needed
-- Functional specifications unclear
-- User story definition
-- Feature prioritization
-- Client-specific requirements
+**Domain**: Optimized and orchestrated code generation
 
-**Key Capabilities:**
-- ✅ Validates business rules compliance
-- ✅ Defines testable acceptance criteria
-- ✅ Prioritizes features (P0/P1/P2/P3)
-- ✅ Knows client specifics (ONET, CosyHosting, Halpades, Lock and Chill)
-- ✅ Ensures multi-tenant business logic
+**Workflow**:
+1. Analyze task complexity
+2. Break down if necessary (Task)
+3. Generate code (respect documentation/)
+4. Launch test-architect for validation
+5. Fix if tests fail
 
-**Tools:** Read, Grep, Glob
+**When to invoke**:
+- Complex code generation
+- Multi-file feature implementation
+- Need for parallel orchestration
+- Code requiring tests
 
-**Example Invocations:**
-```
-"What are the business rules for locker allocation?"
-"Should we allow booking cancellation after check-in?"
-"Define acceptance criteria for credentials update feature"
-"Which client has priority for this feature?"
-```
-
-**Collaboration:**
-- Consults `software-architect` for technical feasibility
-- Consults `documentation-architect` for business rules documentation
+**Available tools**: All tools
 
 ---
 
-### 🤖 client-creator
+### 6. ux-designer
 
-**Purpose:** Automated client creation with complete workflow
+**Responsibilities**:
+- Project ergonomics and styles
+- Define and update style guide in `documentation/`
+- Create wireframes to validate project ergonomics
+- Organize wireframe code with super-coder
 
-**Use for:**
-- Creating new SmartLockers clients (generates all boilerplate)
-- Setting up credentials, tables, collections, tests
-- Validating client setup
+**Domain**: Design and user experience
 
-**Key Capabilities:**
-- ✅ Generates client functions file with routes
-- ✅ Creates database tables (cache + business)
-- ✅ Bootstraps credentials (Bearer token, machine login/password)
-- ✅ Generates Bruno API collection
-- ✅ Creates contract tests
-- ✅ Validates setup with PHPStan
+**Deliverables**:
+- Style guide (`documentation/wireframes/charte-graphique.md`)
+- HTML wireframes (`documentation/wireframes/`)
+- UX guidelines (`documentation/guides/ux-guidelines.tex`)
 
-**Tools:** Read, Write, Edit, Bash, Grep, Glob
+**When to invoke**:
+- Interface creation/redesign
+- Ergonomics validation
+- Style guide update
+- Wireframes for mockups
 
-**Example Invocations:**
-```
-"Create new client mycompany with Stripe and Mailgun APIs"
-"/new-client acme --apis=Beds24"
-```
-
-**Typical workflow:** 10-15 minutes (vs 30-45 min manual), -67% time, -80% errors
+**Available tools**: Read, Write, Edit, Glob, Grep, Task
 
 ---
 
-## How Sub-Agents Work
+### 7. web-optimizer
 
-### Automatic Delegation
+**Responsibilities**:
+- Check code compatibility for all browsers and devices
+- Audit code accessibility
+- Launch ux-designer to optimize responsive design
+- Know and verify natural referencing rules for search engines (textual, voice, LLM)
 
-Claude Code proactively delegates to agents when:
-- Task description matches agent's expertise
-- Agent description includes "PROACTIVELY" keyword
-- Context suggests specialized knowledge needed
+**Domain**: Web optimization, accessibility, SEO
 
-### Explicit Invocation
+**Audits**:
+- Browser compatibility (Chrome, Firefox, Safari, Edge)
+- Responsive design (mobile, tablet, desktop)
+- WCAG 2.1 AA accessibility
+- SEO (Google, Bing, voice, LLM)
 
-You can manually request specific agents:
-```
-"Use the claude-code-optimizer agent to audit my setup"
-```
+**When to invoke**:
+- Accessibility audit
+- Responsive optimization
+- Compatibility verification
+- SEO audit
 
-### Independent Context
+**Available tools**: Read, Grep, Glob, Bash, Task
 
-Each agent:
-- Has its own context window (separate from main conversation)
-- Uses specific tools configured in its definition
-- Follows its custom system prompt
-- Can use different models (sonnet, opus, haiku, or inherit)
-
-## Agent Structure
-
-Each agent is a markdown file with YAML frontmatter:
-
-```markdown
----
-name: agent-name
-description: When and why to invoke this agent
-tools: Tool1, Tool2, Tool3  # Optional, inherits all if omitted
-model: sonnet               # Optional, uses configured default if omitted
 ---
 
-System prompt describing role, expertise, and workflow...
+## 🔄 Agent Interactions
+
+### Typical Workflow: New Feature
+
+```
+1. code-architect: Validates architecture
+   ↓
+2. super-coder: Generates code (breaks down if complex)
+   ↓
+3. test-architect: Tests and validates
+   ↓
+4. documentation-architect: Documents in notebooks/
+   ↓
+5. (Optional) ux-designer: Creates wireframes if UI
+   ↓
+6. (Optional) web-optimizer: Audits accessibility/responsive
 ```
 
-## Creating New Agents
+### Parallel Orchestration
 
-### Quick Method (Recommended)
+**super-coder can launch**:
+- Multiple super-coders in parallel (independent files)
+- test-architect after each generation
 
-1. Run `/agents` command in Claude Code
-2. Select "Create New Agent"
-3. Choose "Project" scope (shared with team)
-4. Define agent with interactive prompts
+**web-optimizer can launch**:
+- ux-designer for responsive optimization
 
-### Manual Method
+**documentation-architect can launch**:
+- Other agents for decision validation (code-architect, test-architect)
 
-1. Create file: `.claude/agents/agent-name.md`
-2. Add YAML frontmatter with required fields
-3. Write detailed system prompt
-4. Save and agent is automatically discovered
+---
 
-## Best Practices
+## 📋 General Rules
 
-### Agent Design
+### Proactive Triggering
 
-- ✅ **Single responsibility:** One focused purpose per agent
-- ✅ **Clear description:** Include "use when..." or "PROACTIVELY" triggers
-- ✅ **Minimal tools:** Only grant necessary tool access
-- ✅ **Detailed prompts:** Provide examples, workflows, checklists
-- ✅ **Inherit model:** Use `model: inherit` unless specific model needed
+**Agents triggered automatically if**:
+- **documentation-architect**: User mentions "docs", "memory", "context"
+- **test-architect**: Code generated, user requests tests
+- **code-architect**: Architectural decision needed
+- **web-optimizer**: User mentions "accessible", "responsive", "SEO"
 
-### Tool Restrictions
+### Communication
 
-Limit tool access to minimum required:
-- **Code review:** Read, Grep, Glob, Bash
-- **Documentation:** Read, Write, WebFetch
-- **Testing:** Read, Bash
-- **Optimization:** All tools (for this meta-agent)
+**Agent report format**:
+- Executive summary (< 100 words)
+- Created/modified deliverables
+- Actions performed
+- Recommendations (if applicable)
 
-### System Prompt Quality
+**Logging**:
+- All agents must trace their actions
+- Reports saved in `documentation/reports/`
 
-Good system prompts include:
-1. Clear role definition
-2. Specific responsibilities
-3. Step-by-step workflows
-4. Examples and templates
-5. Quality checklists
-6. Error patterns to detect
-7. Communication style guidelines
+### Conventions
 
-## Version Control
+- **Respect documentation/**: All agents must respect 8-directory structure
+- **No useless file creation**: Edit existing rather than create
+- **Git commits**: NEVER without explicit user request
+- **Validation**: Always validate with appropriate scripts (PHPStan, tests, etc.)
 
-**Project agents** (in `.claude/agents/`) are:
-- ✅ Checked into git
-- ✅ Shared with all team members
-- ✅ Versioned with the codebase
-- ✅ Automatically available to everyone
+---
 
-**User agents** (in `~/.claude/agents/`) are:
-- Personal to individual developer
-- Not shared via git
-- Available across all projects
+## 🚀 Usage
 
-## Management
-
-### Using `/agents` Command
+### Invoke an Agent
 
 ```bash
-# View all agents
-/agents
+# Via mention in conversation
+@agent-super-coder generate code for module X
 
-# Create new agent (interactive)
-/agents create
-
-# Edit existing agent
-/agents edit agent-name
-
-# Delete agent
-/agents delete agent-name
+# Via Task tool (if agent not available via mention)
+Task(subagent_type="super-coder", prompt="generate module X")
 ```
 
-### Direct File Management
+### Create New Agent
 
-```bash
-# List all project agents
-ls -la .claude/agents/
+1. Consult `claude-code-optimizer`
+2. Define responsibilities clearly
+3. Avoid overlaps with existing agents
+4. Create file `.claude/agents/agent-name.md`
+5. Update this README
 
-# Edit agent
-vim .claude/agents/agent-name.md
+---
 
-# Delete agent
-rm .claude/agents/agent-name.md
-```
+## 📚 Documentation
 
-## Practical Tips
+- **Claude Code Configuration**: `.claude/README.md`
+- **Available Hooks**: `.claude/hooks/README.md`
+- **Available Skills**: `.claude/skills/README.md`
+- **Slash Commands**: `.claude/commands/README.md`
 
-### Working with documentation-architect
+---
 
-**Tip 1: Check memory before optimizing**
-```bash
-/context              # See current memory usage
-/optimize-memory      # If > 70%, optimize
-```
-
-**Tip 2: Archive first, delete later**
-Start conservative, become aggressive once confident:
-1. First month: ALWAYS archive to `.archive/YYYY-MM/`
-2. After validation: Delete truly useless files
-3. Routine: Archive monthly, purge archives > 6 months
-
-**Tip 3: Create quick refs for frequently consulted docs**
-If you consult a doc often (> 3 times/week):
-```bash
-/doc-quick-ref component-name
-```
-Creates concise guide (< 2k tokens vs full doc).
-
-**Tip 4: Combine with claude-code-optimizer**
-For complete optimization:
-```bash
-/optimize-memory                        # Memory bank
-"@claude-code-optimizer audit .claude/" # Configuration
-```
-
-## Integration with SmartLockers
-
-### Project-Specific Context
-
-All agents have access to:
-- **CLAUDE.md** - Project instructions and standards
-- **Memory Bank** - `documentation/memory-bank/` (core + guides)
-- **Documentation** - `documentation/` directory (architecture, API, functional)
-- **Codebase** - All source files via Read/Grep/Glob tools
-
-### SmartLockers Standards
-
-Agents enforce project conventions:
-- Architecture fonctionnelle pure (no classes)
-- Function naming (snake_case with prefixes: `client_`, `api_`, `db_`, `auth_`)
-- Cache-first pattern (update cache ONLY on HTTP 2xx)
-- Bearer token auth (stateless, no sessions)
-- PHPStan niveau 6 compliance (0 errors)
-- 70/20/10 testing strategy (PHPStan 70%, Contracts 20%, Integration 10%)
-- UUID usage for lockers (not numeric IDs)
-- Multi-tenant isolation (table prefixes, no cross-access)
-
-## Troubleshooting
-
-### Agent Not Triggering
-
-1. **Check description:** Must include clear trigger conditions
-2. **Verify YAML:** Syntax must be valid
-3. **Add PROACTIVELY:** Include keyword in description
-4. **Restart Claude Code:** Changes may need session restart
-
-### YAML Validation Errors
-
-Common issues:
-- ❌ Tabs instead of spaces
-- ❌ Missing closing `---`
-- ❌ Invalid field names (use hyphens, not underscores)
-- ❌ Tool names don't match available tools
-
-### Agent Using Wrong Tools
-
-- Check `tools:` field in frontmatter
-- Ensure tool names are comma-separated
-- Omit field to inherit all tools
-
-## Resources
-
-- **Official Docs:** https://docs.claude.com/en/docs/claude-code/sub-agents.md
-- **Project Instructions:** `../CLAUDE.md`
-- **Skills:** `.claude/skills/`
-- **Slash Commands:** `.claude/commands/`
-
-## Related Components
-
-- **Skills** (`.claude/skills/`) - Reusable capabilities for main conversation
-- **Slash Commands** (`.claude/commands/`) - Custom CLI commands
-- **Plugins** - Bundled tools and agents from marketplace
-- **Hooks** (`.claude/hooks/`) - Automated responses to events
+**Last updated**: 2025-11-24
+**Maintained by**: claude-code-optimizer
+**Status**: 7/7 agents created and translated to English ✅

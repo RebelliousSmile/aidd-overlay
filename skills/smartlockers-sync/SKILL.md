@@ -27,7 +27,7 @@ This skill helps you create a complete specification for synchronizing data from
 3. **Define mappings** using the template below
 
 4. **Verify against database schema**:
-   - Check `documentation/architecture/database-schema-complete.md`
+   - Check `documentation/notebooks/architecture/database-schema-complete.md`
    - Ensure field types match
 
 ## SmartLockers Sync Template
@@ -359,7 +359,7 @@ Create fixtures:
 **Critical Rules:**
 - Cache-first pattern mandatory
 - Bearer token auth only
-- Verify schema in `documentation/architecture/database-schema-complete.md`
+- Verify schema in `documentation/notebooks/architecture/database-schema-complete.md`
 - Use UUID in WHERE/UPDATE/PUTUPDATE for lockers
 ```
 

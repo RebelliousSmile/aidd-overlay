@@ -114,4 +114,4 @@ The generated client file contains TODO comments marking where to add custom log
 
 - `/analyze-api-cache` - Analyze existing client data and propose consolidation tables
 - `documentation/architecture/` - Architecture documentation
-- `documentation/developpement/` - Development standards
+- `documentation/notebooks/architecture/` - Development standards

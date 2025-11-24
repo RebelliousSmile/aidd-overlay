@@ -4,23 +4,23 @@ Fix PHPStan errors by running analysis, identifying issues, and applying correct
 
 ---
 
-## 🚨 INSTRUCTION CRITIQUE pour Claude
+## 🚨 CRITICAL INSTRUCTION for Claude
 
-**AVANT toute exécution de commande, tu DOIS te placer dans le répertoire `code/`** :
+**BEFORE executing any command, you MUST navigate to the `code/` directory**:
 
 ```bash
 cd /home/tnn/Projets/SmartLockers/middleware/code
 ```
 
-**Toutes les commandes PHPStan s'exécutent depuis `code/`** :
+**All PHPStan commands execute from `code/`**:
 ```bash
 cd code/
-composer phpstan     # Analyse PHPStan
+composer phpstan     # PHPStan analysis
 composer test        # Tests
 composer quality     # PHPStan + Tests
 ```
 
-**Ne JAMAIS exécuter depuis la racine du projet (`/middleware/`)** ❌
+**NEVER execute from project root (`/middleware/`)** ❌
 
 ---
 
@@ -52,12 +52,12 @@ This command documents the process and common fixes.
 ## What It Does
 
 ### 1. PHPStan Analysis
-Runs `composer phpstan` (level 5) depuis le répertoire `code/` sur:
+Runs `composer phpstan` (level 5) from `code/` directory on:
 - `src/` directory
 - `apis/` directory
 - `clients/` directory
 
-**Commande exécutée** :
+**Executed command**:
 ```bash
 cd code/
 composer phpstan
@@ -98,190 +98,30 @@ function example_function(string $param1, array $param2): array
 
 #### Nomenclature Compliance
 - Follows `snake_case` for functions
-- Prefixes: `client_`, `api_`, `sync_`, `db_`, etc.
-- PHPDoc format standardized
+- Uses proper prefixes: `client_`, `api_`, `provider_`, `db_`, `auth_`
 
-### 4. Iterative Correction
-The command runs in a loop:
-```
-Run PHPStan → Parse errors → Create TODO → Fix errors → Verify → Repeat
-```
-
-Stops when: `Found 0 errors`
-
-## Output
-
-The command provides:
-
-### Progress Report
-```
-=== PHPStan Fix - Iteration 1 ===
-
-Errors found: 6
-- clients/halpades_functions.php: 4 errors
-- src/migrations/20251003105949_exemple_migration.php: 2 errors
-
-Creating TODO list...
-- Fix function.notFound in clients/halpades_functions.php:263
-- Fix function.notFound in clients/halpades_functions.php:267
-- Fix function.notFound in clients/halpades_functions.php:271
-- Fix function.notFound in clients/halpades_functions.php:339
-- Fix catch.neverThrown in src/migrations/20251003105949_exemple_migration.php:21
-- Fix catch.neverThrown in src/migrations/20251003105949_exemple_migration.php:42
-
-Applying fixes...
-✓ Fixed function.notFound (added require_once)
-✓ Fixed catch.neverThrown (removed dead catch)
-
-Re-running PHPStan...
-```
-
-### Final Report
-```
-=== PHPStan Fix Complete ===
-
-Total iterations: 3
-Errors fixed: 6
-Files modified: 2
-
-✅ PHPStan analysis: 0 errors
-
-All files now comply with PHPStan level 5 and PHPDoc standards.
-```
-
-## Error Type Handling
-
-### function.notFound
-**Issue:** Function called but not defined/imported
-
-**Fix:**
-- Add `require_once` for the file containing the function
-- Verify function exists in codebase
-- If not exists, suggest creating stub
+## Common Fixes
 
 ### Missing PHPDoc
-**Issue:** Function lacks proper documentation
+**Error**: "Function has no PHPDoc"
+**Fix**: Add complete PHPDoc block with params, return, throws
 
-**Fix:**
-```php
-// Before
-function process_data($data) {
-    return $data;
-}
+### Missing Type Hints
+**Error**: "Parameter $x has no type"
+**Fix**: Add type hint based on usage in function
 
-// After
-/**
- * Process data and return result
- *
- * @param mixed $data Data to process
- * @return mixed Processed data
- */
-function process_data($data) {
-    return $data;
-}
+### Undefined Function
+**Error**: "Function xyz() not found"
+**Fix**: Add `require_once` for the file containing the function
+
+## Iterative Loop
+
+```bash
+while [ "$(composer phpstan 2>&1 | grep 'errors')" != "" ]; do
+  composer phpstan
+  # Apply fixes
+  # Re-check
+done
 ```
 
-### catch.neverThrown
-**Issue:** Catch block for exception that's never thrown
-
-**Fix:**
-- Remove unnecessary catch block
-- Or add proper exception handling in try block
-
-### Missing type hints
-**Issue:** Parameters or return types not specified
-
-**Fix:**
-```php
-// Before
-function get_user($id) {
-    return [];
-}
-
-// After
-/**
- * Get user by ID
- *
- * @param int $id User ID
- * @return array User data
- */
-function get_user(int $id): array {
-    return [];
-}
-```
-
-## Configuration
-
-Uses `phpstan.neon` configuration:
-- **Level:** 5 (strict)
-- **Paths:** src/, apis/, clients/
-- **Excludes:** vendor/, tests/
-
-## Safety Features
-
-- ✅ **Backup before changes** - Creates git stash if needed
-- ✅ **Incremental fixes** - One error type at a time
-- ✅ **Verification after each fix** - Re-runs PHPStan
-- ✅ **Max iterations limit** - Stops after 10 iterations if stuck
-- ✅ **Rollback on failure** - Can restore from backup
-
-## Best Practices
-
-The command enforces:
-- ✅ All functions have PHPDoc
-- ✅ All parameters are typed
-- ✅ All returns are typed
-- ✅ No dead code (unreachable catches)
-- ✅ No undefined functions
-- ✅ Consistent naming conventions
-
-## Example
-
-### Before
-```php
-function client_halpades_handle_process($params) {
-    $result = api_msexchange_sync_emails($clientName, $config, $forceRefresh);
-    return $result;
-}
-```
-
-**PHPStan errors:**
-- Missing PHPDoc
-- Missing type hints
-- Undefined function `api_msexchange_sync_emails`
-
-### After
-```php
-/**
- * Handler pour la route process-halpades
- * Synchronisation forcée sans cache
- *
- * @param array $params Paramètres de la requête
- * @return array Résultat de la synchronisation
- */
-function client_halpades_handle_process(array $params): array
-{
-    require_once __DIR__ . '/../apis/msexchange_functions.php';
-
-    $clientName = 'halpades';
-    $config = api_msexchange_get_config($clientName);
-    $forceRefresh = $params['force_refresh'] ?? false;
-
-    $result = api_msexchange_sync_emails($clientName, $config, $forceRefresh);
-    return $result;
-}
-```
-
-**PHPStan:** ✅ 0 errors
-
-## Limitations
-
-- Cannot fix logical errors (only syntax/type issues)
-- May need manual intervention for complex type issues
-- Some errors may require architectural changes
-
-## See Also
-
-- `composer phpstan` - Run PHPStan manually
-- `documentation/developpement/bonnes-pratiques.md` - Coding standards
-- `documentation/developpement/conventions-nommage.md` - Naming conventions
+Target: **0 PHPStan errors**

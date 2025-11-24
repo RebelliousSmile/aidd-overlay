@@ -1,372 +1,200 @@
 ---
 name: update-docs
-description: Maintient la documentation à jour après changements de code (sync code → docs)
+description: Maintains documentation up to date after code changes (sync code → docs)
 ---
 
-# Commande : Update Documentation
+# Command: Update Documentation
 
-Tu vas automatiser la mise à jour de la documentation après des changements de code.
+You will automate documentation updates after code changes.
 
-**NOTE** : Cette commande se concentre sur la **synchronisation code → documentation**.
-Pour l'**optimisation de la memory bank** et le **nettoyage de fichiers temporaires**,
-utilise plutôt `/optimize-memory` ou `/clean-docs` (agent `documentation-architect`).
+**NOTE**: This command focuses on **code → documentation synchronization**.
+For **memory bank optimization** and **temporary file cleanup**,
+use `/optimize-memory` or `/clean-docs` (`documentation-architect` agent) instead.
 
-## Complémentarité avec documentation-architect
+## Complementarity with documentation-architect
 
-- `/update-docs` : Après modification de code (sync automatique)
-- `/optimize-memory` : Maintenance memory bank (optimisation périodique)
-- `/clean-docs` : Nettoyage fichiers temporaires (archivage/suppression)
+- `/update-docs`: After code modification (automatic sync)
+- `/optimize-memory`: Memory bank maintenance (periodic optimization)
+- `/clean-docs`: Temporary file cleanup (archiving/deletion)
 
-## Étape 0 : Initialiser le tracking
+## Step 0: Initialize Tracking
 
-Utilise TodoWrite pour créer une todo list de suivi avec ces tâches :
-- Analyser les changements récents (git diff)
-- Identifier les fichiers de documentation impactés
-- Générer les mises à jour nécessaires
-- Valider la cohérence avec le code
-- Créer un rapport de mise à jour
+Use TodoWrite to create a tracking todo list with these tasks:
+- Analyze recent changes (git diff)
+- Identify impacted documentation files
+- Generate necessary updates
+- Validate consistency with code
+- Create update report
 
-Marque chaque tâche comme `in_progress` avant de l'exécuter et `completed` après.
+Mark each task as `in_progress` before executing and `completed` after.
 
-## Étape 1 : Analyser les changements
+## Step 1: Analyze Changes
 
-### 1.1 Détecter les modifications
+### 1.1 Detect Modifications
 
-Exécute `git diff` pour identifier les changements récents :
+Execute `git diff` to identify recent changes:
 ```bash
 git diff HEAD~1 HEAD --name-status
 ```
 
-Si l'utilisateur spécifie un commit ou une branche, utilise-le à la place.
+If user specifies a commit or branch, use that instead.
 
-### 1.2 Catégoriser les changements
+### 1.2 Categorize Changes
 
-Pour chaque fichier modifié, identifie la catégorie :
+For each modified file, identify category:
 
-**Code PHP modifié** (nécessite mise à jour documentation) :
-- `clients/*.php` → `documentation/clients/*.md`
-- `apis/*.php` → `documentation/api/*.md`
-- `providers/*.php` → `documentation/api/*.md`
-- `database/*.php` → `documentation/database/*.md` + `documentation/architecture/database-schema-complete.md`
-- `routes/*.php` → `documentation/api/*.md`
+**Modified PHP code** (requires documentation update):
+- `clients/*.php` → `documentation/notebooks/client/*.md`
+- `apis/*.php` → `documentation/notebooks/api/*.md`
+- `providers/*.php` → `documentation/notebooks/api/*.md`
+- `database/*.php` → `documentation/notebooks/architecture/database/*.md` + `documentation/notebooks/architecture/database-schema-complete.md`
+- `routes/*.php` → `documentation/notebooks/api/*.md`
 
-**Nouvelles fonctions ajoutées** :
-- Extraire les signatures de fonctions avec `grep -n "^function "`
-- Vérifier la présence de PHPDoc
-- Identifier le préfixe (`client_`, `api_`, `provider_`, `db_`, `auth_`)
+**New functions added**:
+- Extract function signatures with `grep -n "^function "`
+- Check for PHPDoc presence
+- Identify prefix (`client_`, `api_`, `provider_`, `db_`, `auth_`)
 
-**Nouvelles tables/migrations** :
-- `code/scripts/migrate.php` modifié → `documentation/database/*.md`
-- Nouvelles tables → `documentation/architecture/database-schema-complete.md`
+**New tables/migrations**:
+- `code/scripts/migrate.php` modified → `documentation/notebooks/architecture/database/*.md`
+- New tables → `documentation/notebooks/architecture/database-schema-complete.md`
 
-## Étape 2 : Identifier les documents impactés
+## Step 2: Identify Impacted Documents
 
-### 2.1 Mapping automatique
+### 2.1 Automatic Mapping
 
-Pour chaque changement, détermine les fichiers de documentation à mettre à jour :
+For each change, determine documentation files to update:
 
-| Changement Code | Documentation Impactée |
-|-----------------|------------------------|
-| `clients/cosyhosting.php` | `documentation/api/guesty.md` |
-| `clients/onet.php` | `documentation/clients/onet.md`, `documentation/api/pilotphone.md` |
-| `clients/halpades.php` | `documentation/clients/halpades.md` |
-| `apis/sync.php` | `documentation/api/sync.md` |
-| `apis/guesty.php` | `documentation/api/guesty.md` |
-| `database/mysql.php` | `documentation/architecture/database-schema-complete.md` |
-| `routes/*.php` | `documentation/api/README.md` |
+| Code Change | Impacted Documentation |
+|-------------|------------------------|
+| `clients/cosyhosting.php` | `documentation/notebooks/api/guesty.md` |
+| `clients/onet.php` | `documentation/notebooks/client/onet.md`, `documentation/notebooks/api/pilotphone.md` |
+| `clients/halpades.php` | `documentation/notebooks/client/halpades.md` |
+| `apis/sync.php` | `documentation/notebooks/api/sync.md` |
+| `apis/guesty.php` | `documentation/notebooks/api/guesty.md` |
+| `database/mysql.php` | `documentation/notebooks/architecture/database-schema-complete.md` |
+| `routes/*.php` | `documentation/notebooks/api/README.md` |
 | `authentication.php` | `documentation/authentication.md` |
 
-### 2.2 Documentation transversale
+### 2.2 Cross-cutting Documentation
 
-Certains changements impactent plusieurs documents :
+Some changes impact multiple documents:
 
-**Architecture modifiée** :
-- Changements structurels → `documentation/architecture/03-component-architecture.md`
-- Nouveaux patterns → `documentation/developpement/patterns-architecture.md`
-- Sécurité → `documentation/architecture/06-security-architecture.md`
+**Architecture modified**:
+- Structural changes → `documentation/notebooks/architecture/03-component-architecture.md`
+- New patterns → `documentation/notebooks/architecture/patterns-architecture.md`
+- Security → `documentation/notebooks/architecture/06-security-architecture.md`
 
-**Nouvelles fonctionnalités** :
-- User stories → `documentation/fonctionnel/user-stories.md`
-- Parcours utilisateur → `documentation/fonctionnel/parcours-utilisateur.md`
+**New features**:
+- User stories → `documentation/notebooks/architecture/user-stories.md`
+- User flows → `documentation/notebooks/architecture/parcours-utilisateur.md`
 
-## Étape 3 : Générer les mises à jour
+## Step 3: Generate Updates
 
-### 3.1 Documentation API
+### 3.1 API Documentation
 
-Pour chaque fonction API modifiée/ajoutée :
+For each modified/added API function:
 
-1. **Lire le code source** et extraire :
-   - Signature de la fonction
-   - Paramètres (types, descriptions PHPDoc)
-   - Valeur de retour
-   - Exemple d'utilisation dans le code
+1. **Read source code** and extract:
+   - Function signature
+   - Parameters (types, PHPDoc descriptions)
+   - Return value
+   - Usage example in code
 
-2. **Mettre à jour le fichier Markdown** correspondant :
-   ```markdown
-   ### `api_function_name($param1, $param2, $config)`
+2. **Update corresponding Markdown file**
 
-   **Description** : [À partir du PHPDoc]
+### 3.2 Database Documentation
 
-   **Paramètres** :
-   - `$param1` (type) : Description
-   - `$param2` (type) : Description
-   - `$config` (array) : Configuration client
+For each new table or schema modification, create/update appropriate documentation files.
 
-   **Retour** : array avec structure :
-   ```php
-   [
-       'status' => 'success|error',
-       'data' => [...],
-       'source' => 'api|cache'
-   ]
-   ```
+### 3.3 PHPDoc Verification
 
-   **Exemple** :
-   ```php
-   $result = api_function_name($data, 'cosyhosting', $config);
-   ```
-   ```
+For each public function without PHPDoc or with incomplete PHPDoc:
 
-### 3.2 Documentation Database
+1. **Auto-generate** PHPDoc
+2. **Request validation** from user before applying
 
-Pour chaque nouvelle table ou modification de schéma :
+## Step 4: Validate Modifications
 
-1. **Créer/mettre à jour** `documentation/database/{table_name}.md` :
-   ```markdown
-   # Table `{table_name}`
+### 4.1 Basic Checks
 
-   ## Description
-   [Description fonctionnelle]
+**Before applying changes, verify**:
+- Valid Markdown syntax
+- Syntactically correct PHP code examples
+- Internal links to existing files
+- Well-formatted PHPDoc
 
-   ## Schéma
-   ```sql
-   CREATE TABLE {table_name} (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       -- colonnes...
-   );
-   ```
+**NOTE**: For complete documentation/code consistency audit,
+use `/optimize-memory` which delegates to `documentation-architect`.
 
-   ## Colonnes
-   | Colonne | Type | Description | Contraintes |
-   |---------|------|-------------|-------------|
-   | id | INT | Identifiant unique | PRIMARY KEY |
+## Step 5: Propose Updates
 
-   ## Index
-   - PRIMARY KEY sur `id`
-   - INDEX sur `{colonne}` (performance requêtes)
+### 5.1 Suggested Modifications
 
-   ## Relations
-   - Foreign key vers `{autre_table}`
+For each documentation file to modify:
 
-   ## Utilisation
-   Utilisée par : `fonction_php()` dans `fichier.php`
-   ```
+1. **Display a diff** of proposed changes
+2. **Request confirmation** from user
+3. **Apply modifications** if accepted
 
-2. **Mettre à jour** `documentation/architecture/database-schema-complete.md` :
-   - Ajouter la nouvelle table dans la section appropriée
-   - Mettre à jour les diagrammes si nécessaire
+### 5.2 New Files
 
-### 3.3 Vérification PHPDoc
+If new documentation files are needed:
 
-Pour chaque fonction publique sans PHPDoc ou avec PHPDoc incomplète :
+1. **Propose creation** with appropriate template
+2. **Auto-fill** with data extracted from code
 
-1. **Générer automatiquement** le PHPDoc :
-   ```php
-   /**
-    * [Description de la fonction à partir du nom et du code]
-    *
-    * @param type $param Description du paramètre
-    * @param array $config Configuration client
-    * @return array Structure de retour
-    * @throws Exception Description des erreurs possibles
-    */
-   function api_example($param, array $config): array
-   {
-       // code...
-   }
-   ```
+## Step 6: Generate Final Report
 
-2. **Demander validation** à l'utilisateur avant d'appliquer
-
-## Étape 4 : Valider les modifications
-
-### 4.1 Vérifications basiques
-
-**Avant d'appliquer les changements, vérifier** :
-- Syntaxe Markdown valide
-- Exemples de code PHP syntaxiquement corrects
-- Liens internes vers fichiers existants
-- PHPDoc bien formaté
-
-**NOTE** : Pour un audit complet de la cohérence documentation/code,
-utilise `/optimize-memory` qui délègue à `documentation-architect`.
-
-## Étape 5 : Proposer les mises à jour
-
-### 5.1 Modifications suggérées
-
-Pour chaque fichier de documentation à modifier :
-
-1. **Afficher un diff** des changements proposés
-2. **Demander confirmation** à l'utilisateur
-3. **Appliquer les modifications** si accepté
-
-### 5.2 Nouveaux fichiers
-
-Si de nouveaux fichiers de documentation sont nécessaires :
-
-1. **Proposer la création** avec le template approprié :
-   - `documentation/api/{service}.md` pour nouvelles APIs
-   - `documentation/database/{table}.md` pour nouvelles tables
-   - `documentation/clients/{client}.md` pour nouveaux clients
-
-2. **Remplir automatiquement** avec les données extraites du code
-
-## Étape 6 : Générer le rapport final
-
-Affiche un rapport concis (< 20 lignes) :
+Display concise report (< 20 lines):
 
 ```markdown
-# 📝 Rapport Mise à Jour Documentation
+# 📝 Documentation Update Report
 
-**Résumé** : X fonctions documentées, Y tables ajoutées
+**Summary**: X functions documented, Y tables added
 
-## Changements Appliqués
-- ✅ `api/sync.md` - Ajout `sync_new_function()`
+## Applied Changes
+- ✅ `api/sync.md` - Added `sync_new_function()`
 - ✅ `database-schema-complete.md` - Table `new_table`
-- ✅ PHPDoc ajouté sur 3 fonctions
+- ✅ PHPDoc added on 3 functions
 
-## Prochaines étapes
-1. `php code/scripts/generate_bruno_collection.php` (si APIs modifiées)
+## Next Steps
+1. `php code/scripts/generate_bruno_collection.php` (if APIs modified)
 2. `composer test && composer phpstan`
-3. Commit : "docs: update after [changes]"
+3. Commit: "docs: update after [changes]"
 
-**Optimisation** : Si docs volumineuses créées, exécute `/optimize-memory`
+**Optimization**: If large docs created, execute `/optimize-memory`
 ```
 
-## Règles Importantes
+## Important Rules
 
-### ❌ Ne JAMAIS
+### ❌ NEVER
 
-- Supprimer de la documentation existante sans validation explicite
-- Modifier les exemples de code sans les tester
-- Créer de nouveaux fichiers de documentation sans demander
-- Écraser les descriptions métier rédigées manuellement
+- Delete existing documentation without explicit validation
+- Modify code examples without testing them
+- Create new documentation files without asking
+- Overwrite manually written business descriptions
 
-### ✅ TOUJOURS
+### ✅ ALWAYS
 
-- Préserver les descriptions fonctionnelles existantes
-- Valider les changements avec l'utilisateur avant application
-- Respecter les templates existants dans `documentation/templates/`
-- Maintenir la cohérence avec `CLAUDE.md`
-- Vérifier la cohérence cross-référence entre documents
+- Preserve existing functional descriptions
+- Validate changes with user before applying
+- Respect existing templates in `documentation/templates/`
+- Maintain consistency with `CLAUDE.md`
+- Check cross-reference consistency between documents
 
-## Options Avancées
+## Advanced Options
 
-### Analyse ciblée
+### Targeted Analysis
 
-L'utilisateur peut spécifier :
-- **Fichier spécifique** : `/update-docs routes/sync.php`
-- **Répertoire** : `/update-docs clients/`
-- **Commit range** : `/update-docs HEAD~5..HEAD`
-- **Type de doc** : `/update-docs --api` (seulement documentation API)
+User can specify:
+- **Specific file**: `/update-docs routes/sync.php`
+- **Directory**: `/update-docs clients/`
+- **Commit range**: `/update-docs HEAD~5..HEAD`
+- **Doc type**: `/update-docs --api` (API documentation only)
 
-### Modes d'exécution
+### Execution Modes
 
-- **Mode interactif** (par défaut) : Demande confirmation pour chaque changement
-- **Mode automatique** : `--auto` - Applique tous les changements sans confirmation
-- **Mode rapport seul** : `--dry-run` - Affiche seulement ce qui serait modifié
-
-## Exemple de Workflow Complet
-
-### 1. Développeur modifie du code
-
-```bash
-# Modifications dans apis/sync.php
-git diff apis/sync.php
-```
-
-### 2. Exécution de la commande
-
-```bash
-/update-docs apis/sync.php
-```
-
-### 3. Analyse automatique
-
-```
-🔍 Analyse des changements...
-
-Fichier : apis/sync.php
-- Fonction ajoutée : sync_new_endpoint($data, $clientName, $config)
-- Fonction modifiée : sync_get_allocations() - Nouveau paramètre $filters
-
-Documentation impactée :
-- documentation/api/sync.md (à mettre à jour)
-```
-
-### 4. Propositions de mise à jour
-
-```markdown
-Mise à jour de documentation/api/sync.md
-
-+ ### `sync_new_endpoint($data, $clientName, $config)`
-+
-+ **Description** : Nouvelle fonction pour gérer l'endpoint XYZ
-+
-+ **Paramètres** :
-+ - `$data` (array) : Données à traiter
-+ - `$clientName` (string) : Nom du client
-+ - `$config` (array) : Configuration client
-+
-+ **Retour** : array avec structure standardisée
-+
-+ **Exemple** :
-+ ```php
-+ $result = sync_new_endpoint($data, 'cosyhosting', $config);
-+ ```
-
-Appliquer cette modification ? [Y/n]
-```
-
-### 5. Validation et application
-
-```
-✅ Modifications appliquées
-💡 N'oubliez pas : php code/scripts/generate_bruno_collection.php
-
-📋 Rapport complet généré
-```
-
-## Intégration avec Workflow Git
-
-Cette commande s'intègre dans le workflow standard :
-
-```bash
-# 1. Développement
-vim apis/sync.php
-
-# 2. Tests
-composer test
-
-# 3. Documentation (AUTOMATIQUE)
-/update-docs apis/sync.php
-
-# 4. Bruno collection (SI API)
-php code/scripts/generate_bruno_collection.php
-
-# 5. Validation
-composer phpstan
-
-# 6. Commit
-git add .
-git commit -m "feat: add new sync endpoint + update docs"
-```
-
-## Notes Techniques
-
-- Utilise `grep`, `git diff`, et `Read` pour l'analyse du code
-- Respecte les formats Markdown existants
-- Préserve les commentaires et sections manuelles
-- Génère des exemples de code testables
-- Valide la syntaxe PHP des exemples générés
+- **Interactive mode** (default): Request confirmation for each change
+- **Automatic mode**: `--auto` - Apply all changes without confirmation
+- **Report only mode**: `--dry-run` - Display only what would be modified

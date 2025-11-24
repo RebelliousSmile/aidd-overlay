@@ -1,6 +1,6 @@
 # Analyze API Cache
 
-Analyse les routes API interrogées et les données mises en cache pour un client, puis propose un schéma de consolidation en base de données avec tables de test.
+Analyzes API routes queried and data cached for a client, then proposes database consolidation schema with test tables.
 
 ## Usage
 
@@ -8,154 +8,154 @@ Analyse les routes API interrogées et les données mises en cache pour un clien
 /analyze-api-cache <client_name>
 ```
 
-**Paramètres :**
-- `client_name` (requis) : Nom du client en minuscules (ex: "halpades", "onet", "cosyhosting")
+**Parameters:**
+- `client_name` (required): Client name in lowercase (ex: "halpades", "onet", "cosyhosting")
 
-## Fonctionnalités
+## Features
 
-La commande effectue les opérations suivantes :
+The command performs the following operations:
 
-### 1. Analyse du Code
-- Parcourt les fichiers `code/clients/{client}_functions.php` et `code/apis/*_functions.php`
-- Identifie tous les appels `api_store_result()` pour découvrir les clés de cache
-- Extrait les variables de données et TTL associées
+### 1. Code Analysis
+- Scans `code/clients/{client}_functions.php` and `code/apis/*_functions.php` files
+- Identifies all `api_store_result()` calls to discover cache keys
+- Extracts data variables and associated TTLs
 
-### 2. Analyse de la Base de Données
-- Vérifie l'existence de la table `{client}_api_cache`
-- Récupère les entrées en cache existantes (max 100 dernières)
-- Analyse la structure JSON des données stockées
+### 2. Database Analysis
+- Verifies existence of `{client}_api_cache` table
+- Retrieves existing cache entries (max 100 most recent)
+- Analyzes JSON structure of stored data
 
-### 3. Génération de Propositions
-- Propose des tables de consolidation basées sur les patterns détectés :
-  - `{client}_reservations` : Réservations
-  - `{client}_vehicles` : Véhicules
-  - `{client}_emails` : Emails
-  - `{client}_contacts` : Contacts
-  - `{client}_materiels` : Matériels
-  - `{client}_agents` : Agents
-  - `{client}_assignations` : Assignations
-  - `{client}_guests` : Invités
-  - `{client}_listings` : Propriétés
+### 3. Proposal Generation
+- Proposes consolidation tables based on detected patterns:
+  - `{client}_reservations`: Reservations
+  - `{client}_vehicles`: Vehicles
+  - `{client}_emails`: Emails
+  - `{client}_contacts`: Contacts
+  - `{client}_materiels`: Materials
+  - `{client}_agents`: Agents
+  - `{client}_assignations`: Assignments
+  - `{client}_guests`: Guests
+  - `{client}_listings`: Properties
 
-### 4. Tables de Test en Doublon
-- Pour chaque table proposée, génère automatiquement une table `test_{table_name}`
-- Structure identique pour permettre les tests sans impacter les données de production
+### 4. Duplicate Test Tables
+- For each proposed table, automatically generates a `test_{table_name}` table
+- Identical structure to allow testing without impacting production data
 
-### 5. Fichier de Migration
-- Crée un fichier de migration dans `code/src/migrations/`
-- Contient les CREATE TABLE pour tables principales et test
-- Contient les DROP TABLE pour rollback (down)
-- Prêt à être exécuté avec `php code/scripts/migrate.php up`
+### 5. Migration File
+- Creates migration file in `code/src/migrations/`
+- Contains CREATE TABLE for main and test tables
+- Contains DROP TABLE for rollback (down)
+- Ready to execute with `php code/scripts/migrate.php up`
 
-## Sortie
+## Output
 
-La commande génère :
+The command generates:
 
-1. **Rapport d'analyse** :
-   - Liste des clés de cache découvertes
-   - Structures de données analysées
-   - Tables proposées avec leur SQL
+1. **Analysis report**:
+   - List of discovered cache keys
+   - Analyzed data structures
+   - Proposed tables with their SQL
 
-2. **Fichier de migration** :
+2. **Migration file**:
    - `code/src/migrations/{timestamp}_consolidate_{client}_data.php`
-   - Tables principales + tables test_
-   - Fonctions up() et down()
+   - Main tables + test_ tables
+   - up() and down() functions
 
-## Exemple
+## Example
 
-### Analyser le cache pour Halpades
+### Analyze cache for Halpades
 
 ```
 /analyze-api-cache halpades
 ```
 
-Cette commande va :
-1. Analyser `code/clients/halpades_functions.php`
-2. Analyser `code/apis/msexchange_functions.php` (utilisé par Halpades)
-3. Lire la table `halpades_api_cache`
-4. Proposer des tables comme :
+This command will:
+1. Analyze `code/clients/halpades_functions.php`
+2. Analyze `code/apis/msexchange_functions.php` (used by Halpades)
+3. Read `halpades_api_cache` table
+4. Propose tables like:
    - `halpades_reservations` + `test_halpades_reservations`
    - `halpades_vehicles` + `test_halpades_vehicles`
    - `halpades_emails` + `test_halpades_emails`
-5. Créer la migration `code/src/migrations/20251006120000_consolidate_halpades_data.php`
+5. Create migration `code/src/migrations/20251006120000_consolidate_halpades_data.php`
 
-### Exécution de la migration
+### Execute Migration
 
-Après génération :
+After generation:
 ```bash
 php code/scripts/migrate.php up
 ```
 
-## Structure des Tables Proposées
+## Proposed Table Structure
 
-Chaque table de consolidation contient :
+Each consolidation table contains:
 
-### Champs Communs
-- `id` : INT AUTO_INCREMENT PRIMARY KEY
-- `external_id` : VARCHAR(255) NOT NULL UNIQUE (ID API externe)
-- `data` : LONGTEXT NOT NULL (JSON complet des données)
-- `created_at` : DATETIME NOT NULL
-- `updated_at` : DATETIME NOT NULL
-- `synced_at` : DATETIME DEFAULT NULL
+### Common Fields
+- `id`: INT AUTO_INCREMENT PRIMARY KEY
+- `external_id`: VARCHAR(255) NOT NULL UNIQUE (external API ID)
+- `data`: LONGTEXT NOT NULL (complete JSON data)
+- `created_at`: DATETIME NOT NULL
+- `updated_at`: DATETIME NOT NULL
+- `synced_at`: DATETIME DEFAULT NULL
 
-### Champs Spécifiques selon le Type
+### Specific Fields by Type
 
-**Réservations :**
+**Reservations:**
 - `start_date`, `end_date`, `status`, `customer_email`
 
-**Véhicules :**
+**Vehicles:**
 - `plate_number`, `model`, `status`
 
-**Agents :**
+**Agents:**
 - `nom`, `prenom`, `email`, `status`
 
-## Cas d'Usage
+## Use Cases
 
-### 1. Nouveau Client
+### 1. New Client
 ```bash
-# Créer d'abord la table de cache
+# First create cache table
 /create-client-migration newclient
 php code/scripts/migrate.php up
 
-# Analyser et proposer consolidation
+# Analyze and propose consolidation
 /analyze-api-cache newclient
 php code/scripts/migrate.php up
 ```
 
-### 2. Client Existant
+### 2. Existing Client
 ```bash
-# Analyser les données en cache existantes
+# Analyze existing cache data
 /analyze-api-cache onet
 
-# Réviser les propositions si nécessaire
-# Puis exécuter la migration
+# Review proposals if necessary
+# Then execute migration
 php code/scripts/migrate.php up
 ```
 
-### 3. Tests
+### 3. Testing
 ```bash
-# Les tables test_ sont créées automatiquement
-# Utiliser dans les tests :
+# test_ tables are created automatically
+# Use in tests:
 php tests/clients/halpades/test_consolidation.php
 ```
 
-## Notes Importantes
+## Important Notes
 
-- ✅ Les tables `test_*` sont créées automatiquement
-- ✅ Structure identique aux tables de production
-- ✅ Permet tests sans risque pour les données réelles
-- ⚠️ Vérifier les propositions avant d'exécuter la migration
-- ⚠️ Adapter les champs spécifiques selon les besoins métier
+- ✅ `test_*` tables created automatically
+- ✅ Identical structure to production tables
+- ✅ Allows testing without risk to real data
+- ⚠️ Verify proposals before executing migration
+- ⚠️ Adapt specific fields according to business needs
 
 ## Limitations
 
-- Analyse limitée aux 100 dernières entrées de cache
-- Détection automatique basée sur les patterns de noms
-- Structures génériques à adapter selon les besoins spécifiques
-- Ne supprime pas les anciennes données de cache
+- Analysis limited to last 100 cache entries
+- Automatic detection based on name patterns
+- Generic structures to adapt to specific needs
+- Does not delete old cache data
 
-## Voir Aussi
+## See Also
 
-- `/create-client-migration` : Créer la table de cache initiale
-- `code/scripts/migrate.php` : Exécuter les migrations
-- `documentation/architecture/database-schema-complete.md` : Schéma complet
+- `/create-client-migration`: Create initial cache table
+- `code/scripts/migrate.php`: Execute migrations
+- `documentation/architecture/database-schema-complete.md`: Complete schema
