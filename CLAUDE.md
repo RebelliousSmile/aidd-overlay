@@ -2,6 +2,26 @@
 
 Ce fichier fournit des directives à Claude Code (claude.ai/code) pour travailler avec le projet **SmartLockers Client Manager**.
 
+## 📦 Structure des Dépôts Git
+
+Le projet utilise **3 dépôts Git séparés** :
+
+1. **`code/.git`** - Code source du middleware
+   - Fichiers PHP, scripts, tests
+   - `composer.json` et `vendor/` dans `code/`
+   - Branches : `main`, `develop`, feature branches
+
+2. **`documentation/.git`** - Documentation technique
+   - Notebooks (wiki), memory-bank, guides
+   - 8 répertoires strictement définis
+   - Synchronisé avec wiki GitLab
+
+3. **`.claude/.git`** - Configuration Claude Code
+   - Agents, skills, commands, hooks
+   - Configuration spécifique Claude Code
+
+**IMPORTANT** : Lors des commits, vérifier quel dépôt est modifié et commiter dans le bon répertoire.
+
 ## Commandes Essentielles
 
 ### Tests et Qualité

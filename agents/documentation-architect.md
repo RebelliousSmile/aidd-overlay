@@ -47,71 +47,118 @@ You are an **expert in technical documentation and memory bank architecture** fo
 
 ```
 documentation/
-├── memory-bank/          # How to code + agent triggering (included at startup)
+├── memory-bank/          # [Claude Code] Dev guidelines loaded at startup
 │   ├── core/            # Essential always loaded (~21k tokens)
-│   └── guides/          # Guides per use case (~4k tokens/guide)
+│   └── guides/          # Use-case guides (~4k tokens/guide)
 │
-├── notebooks/           # Functional documentation (markdown, Warp compatible)
-│   ├── architecture/    # Detailed technical architecture
-│   │   └── database/    # DB schemas per table
-│   ├── client/          # Per-client documentation (ONET, Halpades, etc.)
-│   └── api/             # External APIs documentation
+├── notebooks/           # [Team Wiki] In-depth technical + functional docs (wiki-ready)
+│   ├── architecture/    # Architecture deep-dives, patterns, ADRs
+│   │   └── database/    # DB schemas, relationships, migrations
+│   ├── client/          # Per-client docs (ONET, Halpades, LockAndChill)
+│   ├── api/             # External API docs (Beds24, Guesty, Stripe)
+│   └── fonctionnel/     # Functional docs (user stories, requirements)
+│   # EXCLUDE: test-*.md, diagnostics-*.md, maintenance-*.md
 │
-├── guides/              # End-user guides (.tex for PDF LaTeX export)
+├── guides/              # [End Users] User manuals (.tex → PDF)
 │   ├── installation/
 │   ├── utilisation/
 │   └── troubleshooting/
 │
-├── diagrams/            # Process/mechanics visuals (SVG, PNG, Mermaid)
+├── diagrams/            # [Visual] Architecture, flows, sequences
 │   ├── architecture/
 │   ├── sequences/
 │   └── flows/
 │
-├── reports/             # Model-generated documents
-├── tasks/               # Task plans
+├── reports/             # [Agents] Generated analysis reports
+├── tasks/               # [Planning] Task specs with DoD
 │   └── plans/
-├── reviews/             # Code reviews
-└── wireframes/          # HTML interfaces
+├── reviews/             # [Quality] Code review reports
+└── wireframes/          # [UX] HTML/CSS interface mockups
 ```
 
 **ABSOLUTE RULE**: NEVER create other directories in `documentation/`
+**KEY DISTINCTION**: notebooks/ = team knowledge base (wiki), NOT test/diagnostic scripts
 
 ## Document Placement Rules
 
-### memory-bank/
-- Documentation loaded at startup
-- Mandatory code conventions
-- Critical architectural patterns
-- Format: Markdown < 5k tokens/file
+### 1. memory-bank/ - Development Guidelines (Loaded at Startup)
+**Purpose**: Essential knowledge for coding, conventions, and patterns
+**Content**:
+- Mandatory code conventions (naming, architecture, tests)
+- Critical architectural patterns (cache-first, multi-tenant, etc.)
+- Quick-start guides and essential workflows
+- Agent triggering rules
+**Format**: Markdown < 5k tokens/file
+**Audience**: Claude Code (loaded automatically)
 
-### notebooks/
-- Deep technical documentation
-- System operation explanation
-- Format: Markdown compatible with Warp
+### 2. notebooks/ - In-Depth Team Documentation (Wiki-Ready)
+**Purpose**: Comprehensive technical AND functional documentation for team knowledge sharing
+**Content**:
+- Complete API documentation (external APIs, endpoints, authentication)
+- Detailed architecture analysis (patterns, diagrams, decisions)
+- Per-client/project documentation (business rules, specifics)
+- Database schemas and relationships
+- **Functional documentation** (user stories, business requirements, specifications)
+- **EXCLUDE**: Interactive test scripts, diagnostic notebooks, maintenance scripts
+**Format**: Markdown (wiki-compatible, professional)
+**Audience**: Development team, technical stakeholders, product owners
+**Example**: API integration guides, architecture deep-dives, client specifications, user stories
 
-### guides/
-- End-user guides
-- Format: LaTeX (.tex) for PDF
+### 3. guides/ - End-User Documentation
+**Purpose**: Non-technical user guides and manuals
+**Content**:
+- Installation instructions
+- User manuals
+- Troubleshooting guides
+**Format**: LaTeX (.tex) for PDF export
+**Audience**: End users, administrators
 
-### diagrams/
-- Visual diagrams
-- Format: SVG, PNG, Mermaid
+### 4. diagrams/ - Visual Documentation
+**Purpose**: Architecture, flow, and process visualizations
+**Content**:
+- Architecture diagrams
+- Sequence diagrams
+- Data flow diagrams
+- Process flowcharts
+**Format**: SVG, PNG, Mermaid
+**Audience**: All stakeholders
 
-### reports/
-- Agent-generated reports
-- Format: Markdown
+### 5. reports/ - Agent-Generated Reports
+**Purpose**: Automated analysis and audit reports
+**Content**:
+- Code review reports
+- Compliance matrices
+- Gap analysis
+- Performance audits
+**Format**: Markdown
+**Audience**: Technical leads, architects
 
-### tasks/
-- Task plans
-- Subdirectory: plans/
+### 6. tasks/ - Task Planning
+**Purpose**: Structured task definitions and plans
+**Content**:
+- Task specifications with DoD (Definition of Done)
+- Implementation plans
+- Acceptance criteria
+**Format**: Markdown with structured templates
+**Subdirectories**: plans/
 
-### reviews/
-- Generated code reviews
-- Format: Markdown
+### 7. reviews/ - Code Reviews
+**Purpose**: Code review documentation
+**Content**:
+- Agent-generated code reviews
+- Manual review reports
+- Security audits
+**Format**: Markdown
+**Audience**: Development team
 
-### wireframes/
-- HTML interfaces
-- Format: HTML, CSS
+### 8. wireframes/ - UI/UX Design
+**Purpose**: Interface mockups and design prototypes
+**Content**:
+- HTML/CSS wireframes
+- Interactive prototypes
+- Design specifications
+**Format**: HTML, CSS (standalone)
+**Audience**: UX designers, developers
 
 ## Standard Workflow
 

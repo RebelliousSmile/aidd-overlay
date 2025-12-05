@@ -20,14 +20,14 @@ Ensure optimal user experience:
 ## Responsibilities
 
 1. **Ergonomics and Styles**: Define ergonomics rules, visual styles, user interactions
-2. **Style Guide**: Maintain guide in `documentation/wireframes/charte-graphique.md`
+2. **Style Guide**: Maintain guide in `documentation/memory-bank/guides/charte-graphique.md`
 3. **Wireframes**: Create HTML mockups in `documentation/wireframes/`
 4. **Collaboration with super-coder**: Organize implementation of validated wireframes
 
 ## Deliverables
 
 ### Style Guide
-**Location**: `documentation/wireframes/charte-graphique.md`
+**Location**: `documentation/memory-bank/guides/charte-graphique.md`
 
 **Content**:
 - Color palette (primary, secondary, states)
@@ -47,7 +47,7 @@ Ensure optimal user experience:
 - `locker-allocation.html` - Locker allocation
 
 ### UX Guidelines
-**Location**: `documentation/guides/ux-guidelines.tex`
+**Location**: `documentation/memory-bank/guides/ux-guidelines.md`
 
 **Content**:
 - Ergonomics principles
