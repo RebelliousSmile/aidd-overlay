@@ -30,5 +30,5 @@ Les commandes seront ensuite accessibles dans Claude Code via `/custom:01:migrat
 ## Prérequis
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-- [AIDD](https://github.com/RebelliousSmile/aidd) configuré dans le projet cible
+- [AIDD](https://github.com/ai-driven-dev/aidd-framework) configuré dans le projet cible
 - `gh` CLI pour les commandes interagissant avec GitHub
