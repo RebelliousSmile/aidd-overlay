@@ -5,15 +5,18 @@ description: Output template for alexia after running generate_architecture. Str
 
 # Architecture Generation Summary
 
-## Files created
+## Files created or modified
 
-| Type | Path | Purpose |
-|------|------|---------|
-| agent | `.claude/agents/name.md` | ... |
-| skill | `.claude/skills/name/SKILL.md` | ... |
-| rule | `.claude/rules/category/name.md` | ... |
-| command | `.claude/commands/category/name.md` | ... |
-| template | `aidd_docs/templates/domain/name.md` | ... |
+| Change | Type | Path | Purpose |
+|--------|------|------|---------|
+| created | agent | `.claude/agents/custom-name.md` | ... |
+| created | skill | `.claude/skills/custom/name/SKILL.md` | ... |
+| created | rule | `.claude/rules/custom/name.md` | ... |
+| created | command | `.claude/commands/custom/01/name.md` | ... |
+| created | template | `aidd_docs/templates/custom/name.md` | ... |
+| modified | agent / skill / rule / command / template | `path/to/existing/file` | ... |
+
+> Agents prefixed `custom-` are project-specific. Framework agents (e.g. `alexia`, `kent`) have no prefix.
 
 ## Audit signals addressed
 
