@@ -36,7 +36,12 @@ Collection de commandes personnalisées (slash commands), agents, règles et tem
 
 | Règle | Description |
 |---|---|
+| `04-agentic-tooling` | Pratiques de tooling agentique issues de l'Agentic Readiness Framework (Principe 3) |
 | `04-git-main-protection` | Interdit tout `git commit` ou `git push` sur `main` sans validation explicite de l'utilisateur |
+| `04-rules-namespace` | Convention de namespace pour les règles — toutes les règles projet vont dans `custom/`, le core AIDD ne doit pas être modifié |
+| `06-agentic-tests` | Pratiques de tests agentiques issues de l'Agentic Readiness Framework (Principe 1) |
+| `07-agentic-type-safety` | Pratiques de typage agentique issues de l'Agentic Readiness Framework (Principe 2) |
+| `08-agentic-branching` | Pratiques de branching agentique issues de l'Agentic Readiness Framework |
 | `09-aidd-workflow` | Workflow AIDD de la conception à l'implémentation — s'applique à toute demande touchant au comportement ou à la structure du code |
 
 ## Templates (`aidd_docs/`)
@@ -48,6 +53,7 @@ Les fichiers du dossier `templates/custom/` sont copiés dans `aidd_docs/` du pr
 | `agentic_readiness_framework.md` | Framework d'évaluation de la maturité agentique du projet |
 | `architecture_summary.md` | Résumé de l'architecture technique du projet |
 | `audit_score.md` | Grille de scoring pour l'audit agentique |
+| `quiz_report.md` | Rapport de session de quiz Ada — score et résultats par session |
 
 ## Installation
 
