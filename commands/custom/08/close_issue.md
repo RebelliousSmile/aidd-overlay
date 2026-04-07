@@ -28,10 +28,12 @@ Wrap up a completed plan: read the plan review, then close the linked issue with
    - If `$ARGUMENTS` is provided: use it directly
    - Otherwise: ask the user
 5. Invoke `aidd:08:commit` with argument `auto` — runs silently without user confirmation, must complete before step 6
-6. Build the closing comment from the plan:
-   - Summary line from `## Feature > Summary`
-   - Review file summary if present (`aidd_docs/tasks/**/*<issue_number>*.review.md`)
-   - Commit hash: `` `git log --oneline -1` ``
+6. Build the closing comment using `aidd_docs/templates/custom/close-issue.md`:
+   - **Done**: summary line from `## Feature > Summary` in the plan
+   - **Changelog entry**: generated from plan scope and commit type
+   - **References**: PR url if available, current branch, plan file path
+   - **Checklist**: mark items as checked if verifiable (tests green, branch merged)
+   - **Notes**: review file summary if present (`aidd_docs/tasks/**/*<issue_number>*.review.md`), else omit section
 7. Show the closing comment to user and **wait for confirmation**
 8. Post comment then close:
    - GitHub: `` `gh issue comment <issue_id> --body "<closing-comment>"` `` then `` `gh issue close <issue_id>` ``
