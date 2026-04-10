@@ -146,6 +146,7 @@ description: <description courte>
 | `/custom:01:migrate_docs` | Scanne les dossiers docs, classifie et reformate selon templates AIDD |
 | `/custom:02:release_to_site` | Récupère une release GitHub et traduit en contenu marketing |
 | `/custom:03:site_section` | Planifie et implémente une section sur le site (Nuxt + Vue + UnoCSS) |
+| `/custom:07:project_status` | Exporte un rapport de statut projet avec audit, sécurité et plan d'action 7 jours |
 | `/custom:08:changelog` | Génère ou met à jour CHANGELOG.md à partir de git |
 | `/custom:08:end_plan` | Archive le plan en cours, exécute /learn, retourne sur la branche parente |
 
@@ -177,6 +178,7 @@ Déclenchement : "quiz me", "test my knowledge", "learn the codebase", "Ada"
 | `agentic_readiness_framework.md` | Framework d'évaluation de la maturité agentique |
 | `architecture_summary.md` | Résumé de l'architecture technique |
 | `audit_score.md` | Grille de scoring pour l'audit agentique |
+| `project_status.md` | Rapport de statut projet avec audit, sécurité et plan d'action |
 | `quiz_report.md` | Rapport de session de quiz Ada |
 
 ## Ajout de nouveau contenu
