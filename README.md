@@ -15,14 +15,16 @@ Collection de commandes personnalisées, règles et templates pour les outils de
 
 ```
 .
-├── commands/custom/           # Slash commands Claude Code (/custom:...)
-├── rules/custom/              # Règles Claude Code
-├── templates/custom/          # Templates (copiés dans aidd_docs/)
-│
-└── instructions/              # Fichiers d'instructions root
-    ├── CLAUDE.md              # Pour Claude Code (root)
-    ├── AGENTS.md              # Pour OpenCode (root)
-    └── copilot-instructions.md  # Pour Copilot
+├── agents/                    # Agents Claude Code
+├── commands/                  # Slash commands Claude Code (/...)
+├── misc/                      # Ressources optionnelles (non installées par défaut)
+│   ├── commands/
+│   ├── rules/
+│   └── templates/
+├── rules/                     # Règles Claude Code
+├── skills/                    # Skills Claude Code (/skill:...)
+├── templates/                 # Templates (copiés dans aidd_docs/)
+└── .claude-plugin/            # Métadonnées plugin marketplace
 ```
 
 ## Installation automatique
@@ -130,43 +132,85 @@ description: <description courte>
 
 | Commande | Description |
 |---|---|
-| `/custom:01:migrate_docs` | Migre la documentation existante dans la memory bank AIDD |
-| `/custom:02:decompose_mikado` | Décompose un objectif en graphe de dépendances Mikado |
+| `/migrate_docs` | Migre la documentation existante dans la memory bank AIDD |
+| `/aidd:02:decompose_mikado` | Décompose un objectif en graphe de dépendances Mikado |
 | `/custom:02:previously` | Snapshot synthétique du projet — tests, couverture, activité récente, santé |
-| `/custom:06:journey` | Exécute un parcours utilisateur depuis une issue, log les résultats étape par étape |
+| `/aidd:10:taste` | Évalue si un fichier, plan ou document est toujours d'actualité vs le code réel |
+| `/journey` | Exécute un parcours utilisateur depuis une issue, log les résultats étape par étape |
+| `/custom:06:test_bruno` | Lance les tests Bruno en CLI contre l'environnement local |
+| `/custom:07:project_memory` | Synthétise les fichiers de mémoire et décisions en un markdown exportable |
 | `/custom:07:project_status` | Exporte un rapport de statut projet avec audit, sécurité et plan d'action 7 jours |
-| `/custom:08:changelog` | Génère ou met à jour CHANGELOG.md à partir de git |
-| `/custom:08:close_issue` | Review du plan, génère une entrée changelog, puis ferme l'issue liée |
+| `/changelog` | Génère ou met à jour CHANGELOG.md à partir de git, commit et tag la release |
 | `/custom:08:end_plan` | Archive le plan en cours, exécute /learn, retourne sur la branche parente |
+| `/aidd:10:foresee` | Analyse prospective — détecte les problèmes à moyen terme invisibles aux tests et linters |
 
 ## Règles
 
 | Règle | Description |
 |---|---|
 | `04-git-main-protection` | Interdit git commit/push sur main sans validation |
-| `04-rules-namespace` | Namespace custom/ pour règles projet |
-| `08-issue-closing` | Protocole de clôture de ticket avec plan & review |
+| `07-dry-refactor` | Évite la duplication — extrait la logique partagée avant de copier, enforce DRY |
 | `09-challenge-plan` | Challenge le plan jusqu'à 0 deal breakers |
 | `09-double-review-after-implement` | Double review après implémentation |
 | `09-plan-before-implement` | Exige un plan avant toute implémentation |
 
-## Templates (`aidd_docs/`)
+## Agents
+
+| Agent | Description |
+|---|---|
+| `ada` | Agent quiz interactif — apprend et révise le codebase ou la memory bank |
+
+## Skills
+
+| Skill | Description |
+|---|---|
+| `harvest` | Maintenance globale — réconcilie le tracker, extrait les décisions en mémoire, purge les fichiers éphémères |
+
+## Templates
 
 | Template | Description |
 |---|---|
-| `close-issue.md` | Commentaire de clôture d'issue — résumé, changelog et checklist |
 | `journey.md` | Rapport de test de parcours utilisateur lié à une issue |
 | `previously.md` | Snapshot synthétique pour la commande /previously |
+| `project_memory.md` | Export de la mémoire projet et des décisions avec métriques de taille |
 | `project_status.md` | Rapport de statut projet avec audit, sécurité et plan d'action |
+| `quiz_report.md` | Rapport de session quiz avec score et détail par question |
+
+## Misc (ressources optionnelles)
+
+Fichiers non installés par défaut — à copier manuellement selon les besoins du projet.
+
+| Catégorie | Fichier | Description |
+|---|---|---|
+| Rules | `04-agentic-tooling.md` | Bonnes pratiques d'outillage agentique |
+| Rules | `04-bruno.md` | Règles client API Bruno pour fichiers `.bru` |
+| Rules | `06-agentic-tests.md` | Stratégie de tests pour projets agentiques |
+| Rules | `07-agentic-type-safety.md` | Type safety dans les contextes agentiques |
+| Rules | `07-async-components-marketing.md` | Composants async pour pages marketing |
+| Rules | `07-preconnect-strategy.md` | Stratégie preconnect pour les ressources externes |
+| Rules | `08-agentic-branching.md` | Stratégie de branches pour le développement agentique |
+| Rules | `00-shared-component-scope.md` | Périmètre des composants partagés |
+| Rules | `01-seo-robots-txt.md` | Directives robots.txt pour le SEO |
+| Rules | `03-icons.md` | Pattern lucide-vue-next |
+| Rules | `03-image-optimization.md` | Optimisation images WebP |
+| Rules | `05-test-localstorage.md` | Tests impliquant le localStorage |
+| Templates | `agentic_readiness_framework.md` | Grille d'évaluation architecture compatible IA |
+| Templates | `architecture_summary.md` | Résumé d'architecture projet |
+| Templates | `audit_score.md` | Score d'audit projet |
+| Commands | `01/agentic_architecture.md` | Architecture agentique initiale |
+| Instructions | `instructions.md` | Instructions pour Mistral Vibe avec AIDD |
 
 ## Ajout de nouveau contenu
 
 Pour ajouter une nouvelle commande ou règle :
 
 1. **Créer le fichier source** :
-   - Commandes → `commands/custom/<phase>/<nom>.md`
-   - Règles → `rules/custom/<catégorie>-<nom>.md`
-   - Templates → `templates/custom/<nom>.md`
+   - Commandes → `commands/<phase>_<nom>.md`
+   - Règles → `rules/<catégorie>-<nom>.md`
+   - Templates → `templates/<nom>.md`
+   - Agents → `agents/<nom>.md`
+   - Skills → `skills/<nom>/SKILL.md`
+   - Ressources optionnelles → `misc/rules/`, `misc/templates/`, `misc/commands/`
 
 2. **Mettre à jour ce README** avec la nouvelle entrée dans le tableau correspondant
 
