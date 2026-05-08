@@ -24,6 +24,7 @@ Collection de commandes personnalisées, règles et templates pour les outils de
 ├── rules/                     # Règles Claude Code
 ├── skills/                    # Skills Claude Code (/skill:...)
 ├── templates/                 # Templates (copiés dans aidd_docs/)
+│   └── dev/                   # Templates techniques (checklists, audits)
 └── .claude-plugin/            # Métadonnées plugin marketplace
 ```
 
@@ -148,10 +149,13 @@ description: <description courte>
 
 | Règle | Description |
 |---|---|
+| `01-file-language-and-style` | Langue des fichiers selon l'audience — anglais pour LLM, français pour humains |
+| `01-normative-vs-archive` | Le contenu normatif (must / never / always) doit vivre dans les chemins auto-loadés |
 | `04-git-main-protection` | Interdit git commit/push sur main sans validation |
 | `07-dry-refactor` | Évite la duplication — extrait la logique partagée avant de copier, enforce DRY |
 | `09-challenge-plan` | Challenge le plan jusqu'à 0 deal breakers |
 | `09-double-review-after-implement` | Double review après implémentation |
+| `09-harvest-trigger` | Suggère `/harvest` proactivement quand `aidd_docs/tasks/` s'accumule |
 | `09-plan-before-implement` | Exige un plan avant toute implémentation |
 
 ## Agents
@@ -165,16 +169,20 @@ description: <description courte>
 | Skill | Description |
 |---|---|
 | `harvest` | Maintenance globale — réconcilie le tracker, extrait les décisions en mémoire, purge les fichiers éphémères |
+| `reconcile-normative` | Réconcilie le contenu normatif entre archives, mémoire projet et règles codifiées — détecte doublons, contradictions et règles obsolètes |
+| `web-optimize` | Audit perf web framework-aware (LCP, CLS, INP, TBT, bundle size, N+1) avec checklist adaptée au stack et roadmap priorisée |
 
 ## Templates
 
 | Template | Description |
 |---|---|
+| `harvest.md` | Rapport de session harvest — inventaire, décisions extraites, issues fermées, fichiers purgés |
 | `journey.md` | Rapport de test de parcours utilisateur lié à une issue |
 | `previously.md` | Snapshot synthétique pour la commande /previously |
 | `project_memory.md` | Export de la mémoire projet et des décisions avec métriques de taille |
 | `project_status.md` | Rapport de statut projet avec audit, sécurité et plan d'action |
 | `quiz_report.md` | Rapport de session quiz avec score et détail par question |
+| `dev/perf_checklist_nuxt.md` | Checklist d'audit perf Nuxt 3 (LCP, CLS, INP, bundle, render-blocking) — utilisée par /web-optimize |
 
 ## Misc (ressources optionnelles)
 

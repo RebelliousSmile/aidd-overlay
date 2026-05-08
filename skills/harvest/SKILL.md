@@ -4,51 +4,51 @@ description: Global maintenance skill — reconciles tracker items with processe
 model: opus
 ---
 
-# Harvest — Maintenance globale des plans et tracker
+# Harvest — global plan and tracker maintenance
 
-## Objectif
+## Purpose
 
-Nettoyer `aidd_docs/tasks/` qui grossit, fermer les tracker items orphelins, réconcilier la mémoire et les règles accumulées par `/learn`, puis traiter méthodiquement tous les fichiers restants.
+Clean up the growing `aidd_docs/tasks/` directory, close orphan tracker items, reconcile memory and rules accumulated by `/learn`, then methodically review every remaining file.
 
-## Ordre de traitement
+## Processing order
 
-1. Plans terminés et fichiers éphémères en premier (phases 2–5)
-2. Fichiers restants ensuite, par type (phase 6)
+1. Completed plans and ephemeral files first (phases 2–5)
+2. Remaining files next, by type (phase 6)
 
-## Règles
+## Rules
 
-- Ne jamais fermer un tracker item sans montrer le commentaire de clôture à l'utilisateur
-- Ne jamais supprimer de fichiers sans confirmation explicite
-- Utiliser uniquement le CLI détecté en Phase 1 pour les opérations tracker (jamais les MCP)
-- Commandes shell adaptées à l'OS détecté en Phase 1
+- Never close a tracker item without showing the closing comment to the user
+- Never delete files without explicit confirmation
+- Use only the CLI detected in Phase 1 for tracker operations (never MCP)
+- Shell commands adapted to the OS detected in Phase 1
 
-## Configuration (valeurs par défaut, overridables via argument)
+## Configuration (defaults, overridable via argument)
 
-| Paramètre | Défaut | Description |
+| Parameter | Default | Description |
 |---|---|---|
-| `plan_warn_days` | 14 | Ancienneté à partir de laquelle un plan actif est signalé |
-| `plan_stale_days` | 60 | Ancienneté à partir de laquelle un plan actif est proposé à la suppression |
-| `audit_stale_days` | 90 | Ancienneté à partir de laquelle un audit est signalé |
-| `rule_elevation_threshold` | 3 | Nombre minimum de décisions sur un même sujet pour proposer élévation en règle |
+| `plan_warn_days` | 14 | Age above which an active plan is flagged |
+| `plan_stale_days` | 60 | Age above which an active plan is proposed for deletion |
+| `audit_stale_days` | 90 | Age above which an audit is flagged |
+| `rule_elevation_threshold` | 3 | Minimum number of decisions on the same topic to propose rule elevation |
 
-Si l'utilisateur passe un argument (ex. `/harvest plan_stale_days=30`), utiliser la valeur fournie.
+If the user passes an argument (e.g. `/harvest plan_stale_days=30`), use the provided value.
 
 ---
 
-## Phase 1 — Inventaire complet
+## Phase 1 — Full inventory
 
-Détecter l'OS depuis le contexte de session **une seule fois** et le mémoriser pour toutes les phases suivantes.
+Detect the OS from the session context **once** and remember it for all subsequent phases.
 
-Détecter le type de tracker **une seule fois** et le mémoriser :
+Detect the tracker type **once** and remember it:
 
-| Priorité | Tracker | Détection |
+| Priority | Tracker | Detection |
 |---|---|---|
-| 1 | **GitHub** | `gh repo view` retourne sans erreur |
-| 2 | **GitLab** | `glab repo view` retourne sans erreur |
-| 3 | **Local** | User stories présentes dans `aidd_docs/tasks/` (type 5 ci-dessous) |
-| 4 | **Aucun** | Aucune des détections ci-dessus |
+| 1 | **GitHub** | `gh repo view` returns without error |
+| 2 | **GitLab** | `glab repo view` returns without error |
+| 3 | **Local** | User stories present in `aidd_docs/tasks/` (type 5 below) |
+| 4 | **None** | None of the above |
 
-Lister tous les fichiers `.md` dans `aidd_docs/tasks/` :
+List every `.md` file in `aidd_docs/tasks/`:
 
 ```bash
 # macOS / Linux
@@ -58,30 +58,30 @@ find aidd_docs/tasks -type f -name "*.md" | sort
 Get-ChildItem -Recurse -Filter "*.md" aidd_docs/tasks | Sort-Object Name | Select-Object -ExpandProperty FullName
 ```
 
-Classifier chaque fichier (priorité décroissante sur l'extension composée, puis sur le répertoire et le nom) :
+Classify each file (priority decreasing on the compound extension, then on directory and name):
 
-| Priorité | Type | Détection | Action |
+| Priority | Type | Detection | Action |
 |---|---|---|---|
-| 1 | **Plan terminé** | `*.processed.md` | Harvest → purge si éligible |
-| 2 | **Review** | `*.review.md` | Purge si éligible |
-| 3 | **Journey** | `*.journey.md` | Purge si éligible |
-| 4 | **Audit** | `aidd_docs/tasks/audits/**` (répertoire) | Revue par âge |
-| 5 | **User story** | frontmatter `type: user-story`, ou `# User Story` / `## Acceptance Criteria` dans le contenu, ou préfixe `story-` | Purge si tracker item fermé ou `status: done` |
-| 6 | **Checklist / phase** | `*checklist*`, `*phase-[0-9]*` dans le nom | Purge si tracker item fermé |
-| 7 | **Sous-plan** | `-part-[0-9]` ou `-master` dans le nom **ET** un fichier `-master.md` ou `-master.processed.md` de même préfixe existe | Purge si plan master `.processed.md` existe |
-| 8 | **Plan actif** | `.md` sans aucun suffixe ci-dessus (y compris `-part-N` ou `-master` sans master détectable — repli) | Revue : actif ou abandonné ? |
+| 1 | **Completed plan** | `*.processed.md` | Harvest → purge if eligible |
+| 2 | **Review** | `*.review*.md` (covers `.review.md`, `.review_code.md`, `.review_functional.md`, future variants) | Purge if eligible |
+| 3 | **Journey** | `*.journey.md` | Purge if eligible |
+| 4 | **Audit** | `aidd_docs/tasks/audits/**` (directory) | Review by age |
+| 5 | **User story** | frontmatter `type: user-story`, or `# User Story` / `## Acceptance Criteria` in content, or `story-` prefix | Purge if tracker item closed or `status: done` |
+| 6 | **Checklist / phase** | `*checklist*`, `*phase-[0-9]*` in name | Purge if tracker item closed |
+| 7 | **Sub-plan** | `-part-[0-9]` or `-master` in name **AND** a sibling `-master.md` or `-master.processed.md` exists | Purge if master plan `.processed.md` exists |
+| 8 | **Active plan** | `.md` without any of the above suffixes (including `-part-N` or `-master` with no detectable master — fallback) | Review: active or abandoned? |
 
-Afficher le résumé par type : N processed, N reviews, N journeys, N audits, N user stories, N checklists, N sous-plans, N plans actifs.
+Print the per-type summary: N processed, N reviews, N journeys, N audits, N user stories, N checklists, N sub-plans, N active plans.
 
 ---
 
-## Phase 2 — Réconciliation tracker
+## Phase 2 — Tracker reconciliation
 
-Le comportement de cette phase dépend du tracker détecté en Phase 1.
+This phase's behavior depends on the tracker detected in Phase 1.
 
-### Tracker : GitHub
+### Tracker: GitHub
 
-Vérifier le nombre total d'items :
+Check the total item count:
 
 ```bash
 # macOS / Linux
@@ -91,83 +91,91 @@ gh issue list --state all --json number | jq 'length'
 gh issue list --state all --json number | ConvertFrom-Json | Measure-Object | Select-Object -ExpandProperty Count
 ```
 
-Si total ≤ 200 : requête unique :
+If total ≤ 200: single query:
 
 ```bash
 gh issue list --state all --limit 200 --json number,state,title,url
 ```
 
-Si total > 200 : deux requêtes séparées, concaténer les résultats :
+If total > 200: two separate queries, concatenate results:
 
 ```bash
 gh issue list --state open   --limit 500 --json number,state,title,url
 gh issue list --state closed --limit 500 --json number,state,title,url
 ```
 
-### Tracker : GitLab
+### Tracker: GitLab
 
 ```bash
 glab issue list --all --output json
 ```
 
-Si pagination nécessaire, utiliser `--page` et `--per-page 100`.
+If pagination is needed, use `--page` and `--per-page 100`.
 
-### Tracker : Local (user stories uniquement)
+### Tracker: Local (user stories only)
 
-Lire chaque user story. Un item est considéré **fermé** si son frontmatter contient `status: done` ou `status: closed`. Pas de requête réseau.
+Read each user story. An item is considered **closed** if its frontmatter contains `status: done` or `status: closed`. No network calls.
 
-### Tracker : Aucun
+### Tracker: None
 
-Tous les `.processed.md` sont traités comme groupe C — la Phase 3 est skippée.
-
----
-
-### Extraction du tracker item associé
-
-Pour chaque `.processed.md`, extraire l'identifiant tracker dans cet ordre :
-1. Frontmatter `issue_number:` ou `tracker_id:`
-2. Nom de fichier : préfixe `issue-42`, segment `#42-`, ou `story-slug`
-3. Contenu : `Fixes #42`, `Closes #42`, `**Issue:** #42`, `**Story:**`
-4. Segment entièrement numérique isolé (`-42-` uniquement si non précédé d'une date `YYYY_MM_DD`)
-
-Construire la table d'association : pour chaque `.review.md`, `.journey.md`, user story, checklist et sous-plan, trouver le `.processed.md` ou plan de même nom de base et hériter de son groupe.
-
-### Groupes
-
-- **A — Tracker item ouvert avec plan terminé** → fermer en Phase 3, puis purger en Phase 5
-- **B — Tracker item fermé** → purger directement en Phase 5
-- **C — Aucun tracker item détecté** → purger directement en Phase 5 (Phase 3 skippée — tâche interne ou directe)
+All `.processed.md` files are treated as group C — Phase 3 is skipped.
 
 ---
 
-## Phase 3 — Clôture des tracker items (groupe A)
+### Extracting the associated tracker item
 
-**Si groupe A est vide → passer directement à Phase 4.**
+For each `.processed.md`, extract the tracker identifier in this order:
+1. Frontmatter `issue_number:` or `tracker_id:`
+2. Filename: `issue-42` prefix, `#42-` segment, or `story-slug`
+3. Content: `Fixes #42`, `Closes #42`, `**Issue:** #42`, `**Story:**`
+4. Fully-numeric isolated segment (`-42-` only if not preceded by a `YYYY_MM_DD` date)
 
-Pour chaque item du groupe A, lire le template :
+Build the association table: for each review variant, `.journey.md`, user story, checklist and sub-plan, find the `.processed.md` or plan with the same base and inherit its group.
+
+**Base matching** — slug post-date, not full filename. Reviews and processed plans often have different `YYYY_MM_DD` (review created the day reviewer ran, plan created earlier). Strip the leading date prefix before comparing:
+
+- `2026_05_07-#83-firebase-bundle-split.review_code.md` → slug `#83-firebase-bundle-split`
+- `2026_05_06-#83-firebase-bundle-split.processed.md` → slug `#83-firebase-bundle-split`
+- → match (same slug, different date) — review inherits the processed group
+
+Only fall back to "orphan" if no plan or processed shares the slug.
+
+### Groups
+
+- **A — Tracker item open with completed plan** → close in Phase 3, then purge in Phase 5
+- **B — Tracker item closed** → purge directly in Phase 5
+- **C — No tracker item detected** → purge directly in Phase 5 (Phase 3 skipped — internal or direct task)
+
+---
+
+## Phase 3 — Tracker item closure (group A)
+
+**If group A is empty → skip directly to Phase 4.**
+
+For each item in group A, read the template:
 
 ```
 aidd_docs/templates/custom/close-issue.md
 ```
 
-Remplir les variables dans cet ordre :
-- `{Branch}` : depuis le plan (`**Branch name**`)
-- `{PR}` / `{MR}` : chercher une PR/MR associée à la branche — si aucun résultat, mettre `none`
-- `{Done}` : ligne de résumé depuis `## Summary` ou `## Objectif` du plan
-- `{Changelog}` : scope et type inférés depuis le plan
-- `{Plan}` : chemin relatif du `.processed.md`
-- `{Notes}` : résumé du `.review.md` associé s'il existe, sinon omettre la section
+Fill the variables in this order:
+- `{Branch}`: from the plan (`**Branch name**`)
+- `{PR}` / `{MR}`: search for a PR/MR associated with the branch — if none, set to `none`
+- `{Done}`: summary line from `## Summary` or `## Objectif` in the plan
+- `{Changelog}`: scope and type inferred from the plan
+- `{Plan}`: relative path of the `.processed.md`
+- `{Notes}`: summary of the associated `.review.md` if present, otherwise omit the section
 
-Écrire le commentaire dans un fichier temporaire :
+Write the comment to a temporary file:
 
 ```bash
-# macOS / Linux : /tmp/harvest-close-<n>.md
-# Windows       : $env:TEMP\harvest-close-<n>.md
+# macOS / Linux: /tmp/harvest-close-<n>.md
+# Windows     : $env:TEMP\harvest-close-<n>.md
 ```
 
-Montrer à l'utilisateur et **attendre confirmation** avant de poster.
+Show it to the user and **wait for confirmation** before posting.
 
-**GitHub :**
+**GitHub:**
 ```bash
 # macOS / Linux
 gh issue comment <n> --body-file /tmp/harvest-close-<n>.md && gh issue close <n>
@@ -176,7 +184,7 @@ gh issue comment <n> --body-file /tmp/harvest-close-<n>.md && gh issue close <n>
 gh issue comment <n> --body-file "$env:TEMP\harvest-close-<n>.md" && gh issue close <n>
 ```
 
-**GitLab :**
+**GitLab:**
 ```bash
 # macOS / Linux
 glab issue note <n> --message "$(cat /tmp/harvest-close-<n>.md)" && glab issue close <n>
@@ -185,193 +193,155 @@ glab issue note <n> --message "$(cat /tmp/harvest-close-<n>.md)" && glab issue c
 glab issue note <n> --message (Get-Content "$env:TEMP\harvest-close-<n>.md" -Raw) && glab issue close <n>
 ```
 
-**Local (user story) :**
-Mettre à jour le frontmatter de la user story : `status: done`.
+**Local (user story):**
+Update the user story's frontmatter: `status: done`.
 
-Le `&&` garantit que l'item n'est fermé que si le commentaire a bien été posté.
-
----
-
-## Phase 4 — Réconciliation mémoire (jardinage)
-
-`/learn` s'est exécuté à chaque `end_plan` — les décisions ont déjà été extraites. Mais `/learn` accumule session par session sans réconcilier l'ensemble. Cette phase fait ce que `/learn` ne fait pas : détecter les redondances, contradictions et patterns non codifiés accumulés dans la mémoire.
-
-### Sources à scanner
-
-- `aidd_docs/internal/decisions/` — décisions individuelles
-- `aidd_docs/memory/` — mémoire projet
-- `.claude/rules/custom/` — règles codifiées
-
-### A — Cartographie (scan incrémental)
-
-Déterminer la date du dernier harvest en lisant le fichier le plus récent dans `aidd_docs/harvests/` :
-
-```bash
-# macOS / Linux
-ls -t aidd_docs/harvests/*.md | head -1
-
-# Windows (PowerShell)
-Get-ChildItem aidd_docs/harvests\*.md | Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty FullName
-```
-
-Lister les fichiers dans les trois sources **modifiés depuis cette date** (si aucun harvest précédent : scanner tout) :
-
-```bash
-# macOS / Linux — remplacer <date> par YYYY-MM-DD
-find aidd_docs/internal/decisions aidd_docs/memory .claude/rules/custom \
-  -type f -name "*.md" -newer aidd_docs/harvests/<dernier-rapport>.md | sort
-
-# Windows (PowerShell)
-$lastHarvest = Get-ChildItem aidd_docs\harvests\*.md | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-Get-ChildItem -Recurse -Filter "*.md" aidd_docs\internal\decisions, aidd_docs\memory, .claude\rules\custom |
-  Where-Object { $_.LastWriteTime -gt $lastHarvest.LastWriteTime } | Sort-Object Name | Select-Object -ExpandProperty FullName
-```
-
-**Si aucun fichier retourné → Phase 4 terminée, noter "rien de nouveau depuis le dernier harvest", passer à Phase 5.**
-
-Lire chaque fichier retourné. Construire une carte des sujets couverts (lib/technologie, domaine fonctionnel) avec pour chaque fichier : sujet principal, règle ou décision clé.
-
-### B — Détection
-
-Pour chaque sujet, chercher :
-
-| Problème | Définition | Action |
-|---|---|---|
-| **Doublon** | Même décision décrite dans 2+ fichiers | Fusionner dans le fichier le plus approprié |
-| **Contradiction** | Deux fichiers prescrivent des comportements opposés | Garder le plus récent ou spécifique, annoter le choix |
-| **Pattern récurrent** | Même type de contrainte dans ≥ `rule_elevation_threshold` décisions, absent des rules | Élever en règle `.claude/rules/custom/` |
-| **Décision obsolète** | Référence une lib, fonction ou pattern qui n'existe plus | Signaler à l'utilisateur |
-
-### C — Consolidation
-
-Appliquer les actions de B. Pour chaque modification :
-- **Fusionner** : le fichier cible est le plus récent (date de modification) ; si même date, le plus complet (nombre de lignes). Montrer à l'utilisateur les deux fichiers et le contenu fusionné proposé → **confirmation distincte** : "Fusionner et supprimer la source ?" Réécrire la cible, supprimer la source uniquement après accord.
-- **Élever en règle** : créer `.claude/rules/custom/<n>-<sujet>.md`. Montrer à l'utilisateur la règle créée et la liste des fichiers sources → **confirmation distincte** : "La règle couvre-t-elle entièrement ces fichiers ? Supprimer les sources ?"
-
-Toute autre suppression de fichier mémoire → **confirmation utilisateur** avant d'agir.
-
-### D — Rapport de réconciliation
-
-Lister : N doublons fusionnés, N contradictions résolues, N patterns élevés en règles, N décisions obsolètes signalées.
+The `&&` ensures the item is only closed if the comment was posted successfully.
 
 ---
 
-## Phase 5 — Purge des fichiers éphémères
+## Phase 4 — Memory & normative-load reconciliation (sub-skill)
 
-`/learn` ayant déjà tourné à `end_plan`, les `.processed.md` peuvent être purgés dès que le tracker item est confirmé fermé — pas besoin de marqueur supplémentaire.
+This phase is delegated to the `reconcile-normative` skill:
 
-Critères d'éligibilité :
+```markdown
+@.claude/skills/reconcile-normative/SKILL.md
+```
 
-| Type | Condition de purge |
+Invoke the skill, wait for its user confirmations, collect the returned metrics (entries migrated, rules enriched, duplicates merged, contradictions resolved, patterns elevated, obsolete decisions, rules flagged in the freshness pass) and merge them into the Phase 7 final report.
+
+`reconcile-normative` can also be invoked standalone outside harvest when the user wants a normative audit without tracker/file lifecycle work.
+
+---
+
+## Phase 5 — Purge of ephemeral files
+
+**Order constraint**: Phase 4 must complete before Phase 5. A `.processed.md` may contain a normative slice that Phase 4 needs to elevate — purging first destroys the source. Never reorder.
+
+Since `/learn` already ran at `end_plan`, `.processed.md` files can be purged as soon as the tracker item is confirmed closed — no extra marker needed.
+
+Eligibility criteria:
+
+| Type | Purge condition |
 |---|---|
-| `.processed.md` groupe A | Tracker item fermé en Phase 3 |
-| `.processed.md` groupe B | Tracker item déjà fermé |
-| `.processed.md` groupe C | Aucun tracker item — purger directement |
-| `.review.md` | `.processed.md` de même base (tout groupe) — ou orphelin sans `.processed.md` **ni plan actif** de même base |
-| `.journey.md` | `.processed.md` de même base (tout groupe) — ou orphelin sans `.processed.md` **ni plan actif** de même base |
-| Audits | **Jamais purgés ici** — traités en Phase 6 |
-| Autres types | **Jamais purgés ici** — traités en Phase 6 |
+| `.processed.md` group A | Tracker item closed in Phase 3 |
+| `.processed.md` group B | Tracker item already closed |
+| `.processed.md` group C | No tracker item — purge directly |
+| `.review.md` | `.processed.md` of the same base (any group) — or orphan with no `.processed.md` **nor active plan** of the same base |
+| `.journey.md` | `.processed.md` of the same base (any group) — or orphan with no `.processed.md` **nor active plan** of the same base |
+| Audits | **Never purged here** — handled in Phase 6 |
+| Other types | **Never purged here** — handled in Phase 6 |
 
-Construire la liste des fichiers éligibles. Afficher avec chemin relatif et date de modification. Demander confirmation unique :
+Build the eligible-files list. Display with relative path and modification date. Ask for a single confirmation:
 
-> "Supprimer ces N fichiers ? (irréversible)"
+> "Delete these N files? (irreversible)"
 
 ```bash
 # macOS / Linux
-rm <fichier1> <fichier2> ...
+rm <file1> <file2> ...
 
 # Windows (PowerShell)
-Remove-Item -Path "<fichier1>", "<fichier2>", ...
+Remove-Item -Path "<file1>", "<file2>", ...
 ```
 
 ---
 
-## Phase 6 — Revue méthodique des fichiers restants
+## Phase 6 — Methodical review of remaining files
 
-Analyser chaque type ci-dessous et **collecter** toutes les actions proposées sans agir. Présenter le tableau consolidé en fin de phase, puis attendre une confirmation unique avant d'agir.
+Analyze each type below and **collect** all proposed actions without acting. Present the consolidated table at the end of the phase, then wait for a single confirmation before acting.
 
 ### 6a — User stories
 
-Pour chaque user story, vérifier le tracker item associé (même extraction que Phase 2) :
-- Tracker item **fermé** ou frontmatter `status: done` → collecter : **supprimer**
-- Tracker item **ouvert** → collecter : **conserver**, signaler
-- **Pas de tracker item** → collecter : **à clarifier** (demander à l'utilisateur)
+For each user story, check the associated tracker item (same extraction as Phase 2):
+- Tracker item **closed** or frontmatter `status: done` → collect: **delete**
+- Tracker item **open** → collect: **keep**, flag
+- **No tracker item** → collect: **needs clarification** (ask the user)
 
-### 6b — Checklists et phases intermédiaires
+### 6b — Checklists and intermediate phases
 
-Pour chaque checklist/phase file :
-- Son plan master (même base sans `-phase-N` ou `-checklist`) est **`.processed.md`** → collecter : **supprimer**
-- Plan master **encore actif** → collecter : **conserver**
-- **Aucun master trouvé** → collecter : **orphelin — à clarifier**
+For each checklist/phase file:
+- Its master plan (same base without `-phase-N` or `-checklist`) is **`.processed.md`** → collect: **delete**
+- Master plan **still active** → collect: **keep**
+- **No master found** → collect: **orphan — needs clarification**
 
-### 6c — Sous-plans (`-part-N`, `-master`)
+### 6c — Sub-plans (`-part-N`, `-master`)
 
-Pour chaque master (`-master.md`) :
-- Fichier `-master.processed.md` **existe** → collecter : **supprimer** tous les `-part-N` associés
-- Pas encore `.processed.md` mais **tracker item associé fermé** (même extraction Phase 2) → collecter : **supprimer** le master ET tous ses `-part-N` (travail terminé, `end_plan` non exécuté)
-- Pas encore `.processed.md` et tracker item **ouvert ou absent** → collecter : **conserver**
+For each master (`-master.md`):
+- A `-master.processed.md` file **exists** → collect: **delete** all associated `-part-N`
+- No `.processed.md` yet but **associated tracker item closed** (same extraction as Phase 2) → collect: **delete** the master AND all its `-part-N` (work done, `end_plan` not run)
+- No `.processed.md` yet and tracker item **open or absent** → collect: **keep**
 
-Pour chaque `-part-N` sans master détectable → repli en Plan actif (Phase 6d).
+For each `-part-N` with no detectable master → fall back to Active plan (Phase 6d).
 
-### 6d — Plans actifs potentiellement abandonnés
+### 6d — Active plans potentially abandoned
 
-Pour chaque plan `.md` sans suffix (ni processed, ni user story, ni checklist, ni sous-plan) :
+For each `.md` plan with no suffix (not processed, not user story, not checklist, not sub-plan):
 
-Calculer l'ancienneté depuis la date dans le nom de fichier (`YYYY_MM_DD`) ou depuis la date de modification.
+Compute age from the date in the filename (`YYYY_MM_DD`) or from the modification date.
 
-| Ancienneté | Action collectée |
+| Age | Collected action |
 |---|---|
-| < 14 jours | **conserver** — probablement en cours |
-| 14–60 jours | **à clarifier** — toujours actif, abandonné, ou à archiver ? |
-| > 60 jours | **supprimer** — plan abandonné |
+| < 14 days | **keep** — probably in progress |
+| 14–60 days | **needs clarification** — still active, abandoned, or to archive? |
+| > 60 days | **delete** — abandoned plan |
 
-Pour les plans dont le tracker item associé est **fermé** (quelle que soit l'ancienneté) → collecter : **supprimer**. Appliquer les mêmes règles d'extraction que Phase 2 (frontmatter, nom de fichier, contenu) pour trouver l'identifiant tracker.
+For plans whose associated tracker item is **closed** (regardless of age) → collect: **delete**. Apply the same extraction rules as Phase 2 (frontmatter, filename, content) to find the tracker identifier.
 
-Pour les plans dont un `.review.md` de même base existe → collecter : **supprimer** le plan et son `.review.md` (travail terminé, `end_plan` non exécuté).
+For plans with a `.review*.md` of the same slug AND created the same day → collect: **needs clarification** (ask: "plan terminé — lancer end_plan ? ou en cours ?"). Never auto-keep — same-day review without `.processed.md` is a signal that `end_plan` was forgotten.
 
-### 6e — Plans actifs sans tracker item ni ancienneté suffisante
+For plans with a `.review.md` of the same base → collect: **delete** the plan and its `.review.md` (work done, `end_plan` not run).
 
-Les `.processed.md` groupe C sont purgés en Phase 5 — cette section ne les concerne plus.
+### 6e — Active plans without tracker item nor sufficient age
 
-Pour les plans actifs (`.md` brut) sans tracker item détecté et dans la tranche 14–60 jours (Phase 6d "à clarifier") : demander si le plan est toujours actif, abandonné, ou s'il faut créer un tracker item pour le tracer.
+`.processed.md` group C files are purged in Phase 5 — this section no longer covers them.
+
+For active plans (raw `.md`) with no detected tracker item and within the 14–60 day band (Phase 6d "needs clarification"): ask whether the plan is still active, abandoned, or whether a tracker item should be created to track it.
+
+### 6e-bis — Group C cluster signal
+
+If Phase 5 purged ≥ 5 `.processed.md` group C files sharing a thematic prefix (same feature area, same `perf-*`, `psi-*`, etc. slug fragment), surface to the user:
+
+> "N plans groupe C purgés sur le thème `<slug>`. Workflow drift possible : `end_plan` exécuté sans tracker associé. Créer une issue de tracking rétroactif ?"
+
+Never silent — recurring group C is a signal, not a normal mode.
 
 ### 6f — Audits
 
-Pour chaque fichier dans `audits/` :
+For each file in `audits/`:
 
-| Ancienneté | Action collectée |
+| Age | Collected action |
 |---|---|
-| < 90 jours | **conserver** — snapshot récent |
-| > 90 jours | **à clarifier** — toujours pertinent ou à supprimer ? |
+| < 90 days | **keep** — recent snapshot |
+| > 90 days | **needs clarification** — still relevant or to delete? |
 
-### Confirmation consolidée
+### Consolidated confirmation
 
-Présenter le tableau de toutes les actions collectées :
+Present the table of all collected actions:
 
-| Fichier | Type | Action proposée | Raison |
+| File | Type | Proposed action | Reason |
 |---|---|---|---|
-| `{chemin}` | user story / checklist / sous-plan / plan actif / groupe C / audit | supprimer / conserver / à clarifier | {raison courte} |
+| `{path}` | user story / checklist / sub-plan / active plan / group C / audit | delete / keep / needs clarification | {short reason} |
 
-Résoudre d'abord les lignes **à clarifier** en posant les questions groupées. Une fois toutes les décisions prises, demander confirmation unique :
+Resolve **needs clarification** rows first by asking grouped questions. Once all decisions are made, ask for a single confirmation:
 
-> "Appliquer ces N suppressions ? (irréversible)"
+> "Apply these N deletions? (irreversible)"
 
 ---
 
-## Phase 7 — Rapport final
+## Phase 7 — Final report
 
-Remplir le template de rapport :
+Fill the report template:
 
 ```
 aidd_docs/templates/harvest.md
 ```
 
-Écrire le rapport dans :
+Write the report to:
 
 ```
 aidd_docs/harvests/YYYY_MM_DD-harvest.md
 ```
 
-`aidd_docs/harvests/` est un répertoire de rapports — il n'est jamais scanné par la Phase 1 et ses fichiers ne sont jamais purgés.
+`aidd_docs/harvests/` is a reports directory — it is never scanned by Phase 1 and its files are never purged.
 
-Afficher le rapport complet. Si 0 actions effectuées → "Rien à faire — répertoire propre."
+Display the full report. If 0 actions taken → "Nothing to do — directory clean."
